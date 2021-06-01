@@ -1,12 +1,13 @@
 package com.goodgoodman.otter
 
-import com.goodgoodman.otter.adapter.DbAdapter
-import com.goodgoodman.otter.adapter.DbAdapterManager
+import com.goodgoodman.otter.querygenerator.QueryGeneratorManager
 
 abstract class Migration(
     connection: Connection
 ) {
-    private val adapter: DbAdapter = DbAdapterManager.getAdapterByDriverClassName(connection.driverClassName)
+    companion object : Logger
+
+    private val queryGenerator = QueryGeneratorManager.getQueryGeneratorByDriverClassName(connection.driverClassName)
 
     abstract fun up()
     abstract fun down()
