@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.querygenerator.schema
+package com.goodgoodman.otter.schema
 
 import java.util.*
 
@@ -9,8 +9,10 @@ class ColumnSchema {
     val constraints: EnumSet<Constraint> get() = _constraints
     private val _constraints = EnumSet.noneOf(Constraint::class.java)
 
-    fun setConstraint(vararg constraint: Constraint) {
-        constraints.addAll(constraint)
+    fun setConstraint(vararg constraints: Constraint) {
+        val items = constraints.filter { it !== Constraint.NONE }.toList()
+        _constraints.clear()
+        _constraints.addAll(items)
     }
 
     override fun toString(): String {

@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.querygenerator.schema
+package com.goodgoodman.otter.schema
 
 enum class Constraint {
     NONE,
