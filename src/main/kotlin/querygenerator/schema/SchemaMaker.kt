@@ -1,4 +1,4 @@
 package com.goodgoodman.otter.querygenerator.schema
 
-class Constraint {
-}
+@DslMarker
+annotation class SchemaMaker()
