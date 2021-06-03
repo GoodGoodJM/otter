@@ -22,8 +22,8 @@ class QueryGeneratorTests {
 
         with(columnSchema) {
             val expectedQuery = """
-                $name $type ${queryGenerator.resolveConstraints(constraints)}
-            """.trimIndent()
+                |$name $type ${queryGenerator.resolveConstraints(constraints)}
+            """.trimMargin()
             assertEquals(expectedQuery, queryGenerator.resolveColumn(this))
         }
     }
@@ -33,8 +33,8 @@ class QueryGeneratorTests {
         val queryGenerator = object : QueryGenerator() {}
         val constraints = EnumSet.of(Constraint.NOT_NULL, Constraint.UNIQUE)
         val expectedQuery = """
-            NOT NULL UNIQUE
-        """.trimIndent()
+            |NOT NULL UNIQUE
+        """.trimMargin()
         assertEquals(expectedQuery, queryGenerator.resolveConstraints(constraints))
     }
 
@@ -50,9 +50,9 @@ class QueryGeneratorTests {
             key = "fk_${fromTable}_${toTable}"
         }
         val expectedQuery = """
-            CONSTRAINT ${referenceSchema.key} FOREIGN KEY (${referenceSchema.fromColumn})
-            REFERENCES ${referenceSchema.toTable}(${referenceSchema.toColumn})
-        """.trimIndent()
+            |CONSTRAINT ${referenceSchema.key} FOREIGN KEY (${referenceSchema.fromColumn})
+            |REFERENCES ${referenceSchema.toTable}(${referenceSchema.toColumn})
+        """.trimMargin()
         assertEquals(expectedQuery, queryGenerator.resolveReference(referenceSchema))
     }
 
@@ -71,10 +71,39 @@ class QueryGeneratorTests {
 
         with(tableSchema) {
             val expectedQuery = """
-                CREATE TABLE $name (
-                    ${queryGenerator.resolveColumn(columnSchemas.first())}
-                )
-            """.trimIndent()
+                |CREATE TABLE $name (
+                |    ${queryGenerator.resolveColumn(columnSchemas.first())}
+                |)
+            """.trimMargin()
+            assertEquals(expectedQuery, queryGenerator.resolveTable(tableSchema))
+        }
+    }
+
+    @Test
+    fun `Resolve a table which has multiple column schemas`() {
+        val queryGenerator = object : QueryGenerator() {}
+
+        val tableSchema = TableSchema().apply {
+            name = "table"
+            column {
+                name = "id"
+                type = "INT UNSIGNED"
+                setConstraint(Constraint.PRIMARY, Constraint.AUTO_INCREMENT)
+            }
+            column {
+                name = "temp_id"
+                type = "INT UNSIGNED"
+                setConstraint(Constraint.UNIQUE, Constraint.NOT_NULL)
+            }
+        }
+
+        with(tableSchema) {
+            val expectedQuery = """
+                |CREATE TABLE $name (
+                |    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                |    temp_id INT UNSIGNED NOT NULL UNIQUE
+                |)
+            """.trimMargin()
             assertEquals(expectedQuery, queryGenerator.resolveTable(tableSchema))
         }
     }

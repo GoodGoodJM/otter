@@ -8,12 +8,12 @@ import java.util.*
 
 abstract class QueryGenerator {
     fun resolveColumns(columnSchemas: List<ColumnSchema>): String =
-        columnSchemas.joinToString(",\n", transform = this::resolveColumn)
+        columnSchemas.joinToString(",\n    ", transform = this::resolveColumn).trimIndent()
 
     fun resolveColumn(columnSchema: ColumnSchema): String = with(columnSchema) {
         """
-            $name $type ${resolveConstraints(constraints)}
-        """.trimIndent()
+            |$name $type ${resolveConstraints(constraints)}
+        """.trimMargin()
     }
 
     fun resolveConstraints(constraints: EnumSet<Constraint>): String {
@@ -30,16 +30,16 @@ abstract class QueryGenerator {
 
     fun resolveReference(referenceSchema: ReferenceSchema): String = with(referenceSchema) {
         """
-            CONSTRAINT $key FOREIGN KEY ($fromColumn)
-            REFERENCES $toTable($toColumn)
-        """.trimIndent()
+            |CONSTRAINT $key FOREIGN KEY ($fromColumn)
+            |REFERENCES $toTable($toColumn)
+        """.trimMargin()
     }
 
     fun resolveTable(tableSchema: TableSchema): String = with(tableSchema) {
         """
-            CREATE TABLE $name (
-                ${resolveColumns(columnSchemas)}
-            )
-        """.trimIndent()
+            |CREATE TABLE $name (
+            |    ${resolveColumns(columnSchemas)}
+            |)
+        """.trimMargin()
     }
 }
