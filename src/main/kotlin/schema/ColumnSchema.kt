@@ -3,8 +3,8 @@ package com.goodgoodman.otter.schema
 import java.util.*
 
 class ColumnSchema {
+    var tableName = ""
     var name = ""
-    var comment = ""
     var type = ""
     val constraints: EnumSet<Constraint> get() = _constraints
     private val _constraints = EnumSet.noneOf(Constraint::class.java)
@@ -18,13 +18,18 @@ class ColumnSchema {
         _constraints.addAll(items)
     }
 
+    @SchemaMaker
     fun reference(block: ReferenceSchema.() -> Unit) {
         val referenceSchema = ReferenceSchema()
         referenceSchema.block()
+        referenceSchema.apply {
+            fromTable = tableName
+            fromColumn = name
+        }
         _referenceSchemas.add(referenceSchema)
     }
 
     override fun toString(): String {
-        return "ColumnSchema(name='$name', comment='$comment', type='$type', _constraints=$_constraints, _referenceSchemas=$_referenceSchemas)"
+        return "ColumnSchema(tableName='$tableName', name='$name', type='$type', _constraints=$_constraints, _referenceSchemas=$_referenceSchemas)"
     }
 }

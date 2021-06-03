@@ -35,16 +35,18 @@ class ColumnSchemaTests {
 
     @Test
     fun `외래키 지정`() {
+        val columnName = "temp_id"
         val referenceSchema = ReferenceSchema().apply {
-            table = "temp"
-            column = "id"
+            fromColumn = columnName
+            toTable = "temp"
+            toColumn = "id"
             key = "fk_temp_id"
         }
         val columnSchema = ColumnSchema().apply {
-            name = "temp_id"
+            name = columnName
             reference {
-                table = referenceSchema.table
-                column = referenceSchema.column
+                toTable = referenceSchema.toTable
+                toColumn = referenceSchema.toColumn
                 key = referenceSchema.key
             }
         }
@@ -54,21 +56,21 @@ class ColumnSchemaTests {
     @Test
     fun `외래키 복수 지정`() {
         val referenceSchema = ReferenceSchema().apply {
-            table = "temp"
-            column = "id"
+            toTable = "temp"
+            toColumn = "id"
             key = "fk_temp_id"
         }
         val columnSchema = ColumnSchema().apply {
             name = "temp_id"
             reference {
-                table = referenceSchema.table
-                column = referenceSchema.column
+                toTable = referenceSchema.toTable
+                toColumn = referenceSchema.toColumn
                 key = referenceSchema.key
             }
             reference {
-                table = "${referenceSchema.table}_1"
-                column = "${referenceSchema.column}_1"
-                key = "${referenceSchema.key}_1"
+                toTable = referenceSchema.toTable
+                toColumn = referenceSchema.toColumn
+                key = referenceSchema.key
             }
         }
         assertEquals(2, columnSchema.referenceSchema.size)
