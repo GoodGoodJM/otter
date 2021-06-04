@@ -10,7 +10,7 @@ abstract class QueryGenerator {
     fun resolveColumns(columnSchemas: List<ColumnSchema>): String =
         columnSchemas.joinToString(",\n    ", transform = this::resolveColumn).trimIndent()
 
-    fun resolveColumn(columnSchema: ColumnSchema): String = with(columnSchema) {
+    private fun resolveColumn(columnSchema: ColumnSchema): String = with(columnSchema) {
         """
             |$name $type ${resolveConstraints(constraints)}
         """.trimMargin()
@@ -32,7 +32,7 @@ abstract class QueryGenerator {
         return referenceSchema.joinToString("\n,    ", transform = this::resolveReference)
     }
 
-    fun resolveReference(referenceSchema: ReferenceSchema): String = with(referenceSchema) {
+    private fun resolveReference(referenceSchema: ReferenceSchema): String = with(referenceSchema) {
         """
             |CONSTRAINT $key FOREIGN KEY ($fromColumn)
             |    REFERENCES $toTable($toColumn)

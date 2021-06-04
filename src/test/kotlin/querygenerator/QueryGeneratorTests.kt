@@ -20,12 +20,10 @@ class QueryGeneratorTests {
             setConstraint(Constraint.NOT_NULL, Constraint.UNIQUE, Constraint.PRIMARY, Constraint.AUTO_INCREMENT)
         }
 
-        with(columnSchema) {
-            val expectedQuery = """
-                |$name $type ${queryGenerator.resolveConstraints(constraints)}
-            """.trimMargin()
-            assertEquals(expectedQuery, queryGenerator.resolveColumn(this))
-        }
+        val expectedQuery = """
+            |${columnSchema.name} ${columnSchema.type} ${queryGenerator.resolveConstraints(columnSchema.constraints)}
+        """.trimMargin()
+        assertEquals(expectedQuery, queryGenerator.resolveColumns(listOf(columnSchema)))
     }
 
     @Test
@@ -51,9 +49,9 @@ class QueryGeneratorTests {
         }
         val expectedQuery = """
             |CONSTRAINT ${referenceSchema.key} FOREIGN KEY (${referenceSchema.fromColumn})
-            |REFERENCES ${referenceSchema.toTable}(${referenceSchema.toColumn})
+            |    REFERENCES ${referenceSchema.toTable}(${referenceSchema.toColumn})
         """.trimMargin()
-        assertEquals(expectedQuery, queryGenerator.resolveReference(referenceSchema))
+        assertEquals(expectedQuery, queryGenerator.resolveReferences(listOf(referenceSchema)))
     }
 
     @Test
@@ -71,7 +69,7 @@ class QueryGeneratorTests {
 
         val expectedQuery = """
                 |CREATE TABLE ${tableSchema.name} (
-                |    ${queryGenerator.resolveColumn(tableSchema.columnSchemas.first())}
+                |    ${queryGenerator.resolveColumns(tableSchema.columnSchemas)}
                 |)
             """.trimMargin()
         assertEquals(expectedQuery, queryGenerator.resolveTable(tableSchema))
