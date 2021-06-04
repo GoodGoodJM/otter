@@ -54,4 +54,6 @@ abstract class QueryGenerator {
             |)
         """.trimMargin()
     }
+
+    fun dropTable(tableName: String): String = "DROP TABLE $tableName"
 }
