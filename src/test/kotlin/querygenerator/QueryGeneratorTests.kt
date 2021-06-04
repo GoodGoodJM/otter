@@ -138,7 +138,6 @@ class QueryGeneratorTests {
             |)
         """.trimMargin()
         val actualQuery = queryGenerator.resolveTable(tableSchema)
-        println(actualQuery)
         assertEquals(expectedQuery, actualQuery)
     }
 }
