@@ -9,7 +9,7 @@ class ColumnSchema {
     val constraints: EnumSet<Constraint> get() = _constraints
     private val _constraints = EnumSet.noneOf(Constraint::class.java)
 
-    val referenceSchema: List<ReferenceSchema> get() = _referenceSchemas
+    val referenceSchemas: List<ReferenceSchema> get() = _referenceSchemas
     private val _referenceSchemas = mutableListOf<ReferenceSchema>()
 
     fun setConstraint(vararg constraints: Constraint) {

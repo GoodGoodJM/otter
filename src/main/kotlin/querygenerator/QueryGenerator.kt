@@ -28,17 +28,29 @@ abstract class QueryGenerator {
         else -> ""
     }
 
+    fun resolveReferences(referenceSchema: List<ReferenceSchema>): String {
+        return referenceSchema.joinToString("\n,    ", transform = this::resolveReference)
+    }
+
     fun resolveReference(referenceSchema: ReferenceSchema): String = with(referenceSchema) {
         """
             |CONSTRAINT $key FOREIGN KEY ($fromColumn)
-            |REFERENCES $toTable($toColumn)
+            |    REFERENCES $toTable($toColumn)
         """.trimMargin()
     }
 
     fun resolveTable(tableSchema: TableSchema): String = with(tableSchema) {
+        var body = resolveColumns(columnSchemas)
+        val references = columnSchemas.flatMap { it.referenceSchemas }
+        if (references.isNotEmpty()) {
+            body = """
+                |$body,
+                |    ${resolveReferences(references)}
+            """.trimMargin()
+        }
         """
             |CREATE TABLE $name (
-            |    ${resolveColumns(columnSchemas)}
+            |    $body
             |)
         """.trimMargin()
     }

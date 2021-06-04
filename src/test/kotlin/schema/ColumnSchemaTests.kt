@@ -50,7 +50,7 @@ class ColumnSchemaTests {
                 key = referenceSchema.key
             }
         }
-        assertEquals(referenceSchema.toString(), columnSchema.referenceSchema.first().toString())
+        assertEquals(referenceSchema.toString(), columnSchema.referenceSchemas.first().toString())
     }
 
     @Test
@@ -73,6 +73,6 @@ class ColumnSchemaTests {
                 key = referenceSchema.key
             }
         }
-        assertEquals(2, columnSchema.referenceSchema.size)
+        assertEquals(2, columnSchema.referenceSchemas.size)
     }
 }

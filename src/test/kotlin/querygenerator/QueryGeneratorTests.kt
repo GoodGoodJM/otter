@@ -69,14 +69,12 @@ class QueryGeneratorTests {
             }
         }
 
-        with(tableSchema) {
-            val expectedQuery = """
-                |CREATE TABLE $name (
-                |    ${queryGenerator.resolveColumn(columnSchemas.first())}
+        val expectedQuery = """
+                |CREATE TABLE ${tableSchema.name} (
+                |    ${queryGenerator.resolveColumn(tableSchema.columnSchemas.first())}
                 |)
             """.trimMargin()
-            assertEquals(expectedQuery, queryGenerator.resolveTable(tableSchema))
-        }
+        assertEquals(expectedQuery, queryGenerator.resolveTable(tableSchema))
     }
 
     @Test
@@ -97,14 +95,52 @@ class QueryGeneratorTests {
             }
         }
 
-        with(tableSchema) {
-            val expectedQuery = """
-                |CREATE TABLE $name (
+        val expectedQuery = """
+                |CREATE TABLE ${tableSchema.name} (
                 |    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 |    temp_id INT UNSIGNED NOT NULL UNIQUE
                 |)
             """.trimMargin()
-            assertEquals(expectedQuery, queryGenerator.resolveTable(tableSchema))
+        assertEquals(expectedQuery, queryGenerator.resolveTable(tableSchema))
+    }
+
+    @Test
+    fun `Resolve a table with foreign key`() {
+        val queryGenerator = object : QueryGenerator() {}
+        val referenceSchema = ReferenceSchema().apply {
+            fromTable = "test_table"
+            fromColumn = "temp_id"
+            toTable = "temp"
+            toColumn = "id"
+            key = "fk_test_table_temp_id"
         }
+        val tableSchema = TableSchema().apply {
+            name = referenceSchema.fromTable
+            column {
+                name = "id"
+                type = "INT UNSIGNED"
+                setConstraint(Constraint.PRIMARY, Constraint.AUTO_INCREMENT)
+            }
+            column {
+                name = referenceSchema.fromColumn
+                type = "INT UNSIGNED"
+                setConstraint(Constraint.NOT_NULL)
+                reference {
+                    toTable = referenceSchema.toTable
+                    toColumn = referenceSchema.toColumn
+                    key = referenceSchema.key
+                }
+            }
+        }
+        val expectedQuery = """
+            |CREATE TABLE ${tableSchema.name} (
+            |    ${queryGenerator.resolveColumns(tableSchema.columnSchemas)},
+            |    CONSTRAINT ${referenceSchema.key} FOREIGN KEY (${referenceSchema.fromColumn})
+            |    REFERENCES ${referenceSchema.toTable}(${referenceSchema.toColumn})
+            |)
+        """.trimMargin()
+        val actualQuery = queryGenerator.resolveTable(tableSchema)
+        println(actualQuery)
+        assertEquals(expectedQuery, actualQuery)
     }
 }
