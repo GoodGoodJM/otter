@@ -140,4 +140,12 @@ class QueryGeneratorTests {
         val actualQuery = queryGenerator.resolveTable(tableSchema)
         assertEquals(expectedQuery, actualQuery)
     }
+
+    @Test
+    fun `Drop table`() {
+        val queryGenerator = object : QueryGenerator() {}
+        val targetTable = "test"
+        val expectedQuery = "DROP TABLE $targetTable"
+        assertEquals(expectedQuery, queryGenerator.dropTable(targetTable))
+    }
 }

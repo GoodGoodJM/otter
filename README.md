@@ -6,8 +6,8 @@ DB Migration Tool for Kotlin. Inspired by [harmonica](https://github.com/KenjiOh
 
 ## Progress
 
-- [ ] Create Table, Drop Table
-- [ ] Support MySQL, MariaDB
+- [X] Create Table, Drop Table
+- [X] Support MySQL, MariaDB
 - [X] ForeignKey
 - [ ] Type Support
 - [ ] Add Column, Drop Column
