@@ -11,8 +11,8 @@ abstract class Migration(
 
     private val queryGenerator = QueryGeneratorManager.getQueryGeneratorByDriverClassName(config.driverClassName)
 
-    val tableSchemas: List<TableSchema> get() = _tableSchemas
-    private val _tableSchemas = mutableListOf<TableSchema>()
+    val reservedQueries: List<String> get() = _reservedQueries
+    private val _reservedQueries = mutableListOf<String>()
 
     abstract fun up()
     abstract fun down()
@@ -21,10 +21,10 @@ abstract class Migration(
     fun createTable(block: TableSchema.() -> Unit) {
         val tableSchema = TableSchema()
         tableSchema.block()
-        _tableSchemas.add(tableSchema)
+        _reservedQueries.add(queryGenerator.resolveTable(tableSchema))
     }
 
     fun dropTable(name: String) {
-
+        _reservedQueries.add(queryGenerator.dropTable(name))
     }
 }
