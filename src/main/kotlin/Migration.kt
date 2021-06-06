@@ -1,6 +1,7 @@
 package com.goodgoodman.otter
 
 import com.goodgoodman.otter.querygenerator.QueryGeneratorManager
+import com.goodgoodman.otter.schema.AlterColumnSchema
 import com.goodgoodman.otter.schema.SchemaMaker
 import com.goodgoodman.otter.schema.TableSchema
 
@@ -26,5 +27,16 @@ abstract class Migration(
 
     fun dropTable(name: String) {
         _reservedQueries.add(queryGenerator.dropTable(name))
+    }
+
+    fun addColumn(block: AlterColumnSchema.() -> Unit) = alterColumn(AlterColumnSchema.Type.ADD, block)
+
+    fun dropColumn(block: AlterColumnSchema.() -> Unit) = alterColumn(AlterColumnSchema.Type.DROP, block)
+
+    private fun alterColumn(type: AlterColumnSchema.Type, block: AlterColumnSchema.() -> Unit) {
+        val alterColumnSchema = AlterColumnSchema()
+        alterColumnSchema.alterType = type
+        alterColumnSchema.block()
+        _reservedQueries.add(queryGenerator.resolveAlterColumn(alterColumnSchema))
     }
 }

@@ -1,9 +1,7 @@
 package com.goodgoodman.otter.querygenerator
 
-import com.goodgoodman.otter.schema.ColumnSchema
-import com.goodgoodman.otter.schema.Constraint
-import com.goodgoodman.otter.schema.ReferenceSchema
-import com.goodgoodman.otter.schema.TableSchema
+import com.goodgoodman.otter.querygenerator.exception.UnsupportedAlterColumnTypeException
+import com.goodgoodman.otter.schema.*
 import java.util.*
 
 abstract class QueryGenerator {
@@ -56,4 +54,20 @@ abstract class QueryGenerator {
     }
 
     fun dropTable(tableName: String): String = "DROP TABLE $tableName"
+
+    fun resolveAlterColumn(alterColumnSchema: AlterColumnSchema): String = when (alterColumnSchema.alterType) {
+        AlterColumnSchema.Type.ADD -> {
+            val constraints = alterColumnSchema.constraints
+            val constraintQuery = if (constraints.isNotEmpty()) " ${resolveConstraints(constraints)}" else ""
+            """
+            |ALTER TABLE ${alterColumnSchema.table}
+            |ADD ${alterColumnSchema.name} ${alterColumnSchema.type}$constraintQuery
+            """.trimMargin()
+        }
+        AlterColumnSchema.Type.DROP -> """
+            |ALTER TABLE ${alterColumnSchema.table}
+            |DROP COLUMN ${alterColumnSchema.name}
+        """.trimMargin()
+        else -> throw UnsupportedAlterColumnTypeException(alterColumnSchema)
+    }
 }

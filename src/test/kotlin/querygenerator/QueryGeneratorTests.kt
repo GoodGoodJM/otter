@@ -1,10 +1,7 @@
 package querygenerator
 
 import com.goodgoodman.otter.querygenerator.QueryGenerator
-import com.goodgoodman.otter.schema.ColumnSchema
-import com.goodgoodman.otter.schema.Constraint
-import com.goodgoodman.otter.schema.ReferenceSchema
-import com.goodgoodman.otter.schema.TableSchema
+import com.goodgoodman.otter.schema.*
 import org.junit.Test
 import java.util.*
 import kotlin.test.assertEquals
@@ -147,5 +144,42 @@ class QueryGeneratorTests {
         val targetTable = "test"
         val expectedQuery = "DROP TABLE $targetTable"
         assertEquals(expectedQuery, queryGenerator.dropTable(targetTable))
+    }
+
+    @Test
+    fun `Add column`() {
+        val queryGenerator = object : QueryGenerator() {}
+        val addColumnSchema = AlterColumnSchema().apply {
+            alterType = AlterColumnSchema.Type.ADD
+            table = "test"
+            name = "hello_id"
+            type = "INT UNSIGNED"
+            setConstraint(Constraint.NOT_NULL, Constraint.UNIQUE)
+        }
+
+        val expectedQuery = """
+            |ALTER TABLE ${addColumnSchema.table}
+            |ADD ${addColumnSchema.name} ${addColumnSchema.type} ${queryGenerator.resolveConstraints(addColumnSchema.constraints)}
+        """.trimMargin()
+        val actualQuery = queryGenerator.resolveAlterColumn(addColumnSchema)
+        println(actualQuery)
+        assertEquals(expectedQuery, actualQuery)
+    }
+
+    @Test
+    fun `Drop column`() {
+        val queryGenerator = object : QueryGenerator() {}
+        val dropColumnSchema = AlterColumnSchema().apply {
+            alterType = AlterColumnSchema.Type.DROP
+            table = "test"
+            name = "hello_id"
+        }
+        val expectedQuery = """
+            |ALTER TABLE ${dropColumnSchema.table}
+            |DROP COLUMN ${dropColumnSchema.name}
+        """.trimMargin()
+        val actualQuery = queryGenerator.resolveAlterColumn(dropColumnSchema)
+        println(actualQuery)
+        assertEquals(expectedQuery, actualQuery)
     }
 }
