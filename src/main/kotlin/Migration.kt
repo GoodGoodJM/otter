@@ -29,6 +29,10 @@ abstract class Migration(
         _reservedQueries.add(queryGenerator.dropTable(name))
     }
 
+    fun rawQuery(sql: String) {
+        _reservedQueries.add(sql)
+    }
+
     fun addColumn(block: AlterColumnSchema.() -> Unit) = alterColumn(AlterColumnSchema.Type.ADD, block)
 
     fun dropColumn(block: AlterColumnSchema.() -> Unit) = alterColumn(AlterColumnSchema.Type.DROP, block)
