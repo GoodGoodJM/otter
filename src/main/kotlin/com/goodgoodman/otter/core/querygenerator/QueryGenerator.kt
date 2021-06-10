@@ -1,7 +1,7 @@
-package com.goodgoodman.otter.querygenerator
+package com.goodgoodman.otter.core.querygenerator
 
-import com.goodgoodman.otter.querygenerator.exception.UnsupportedAlterColumnTypeException
-import com.goodgoodman.otter.schema.*
+import com.goodgoodman.otter.core.querygenerator.exception.UnsupportedAlterColumnTypeException
+import com.goodgoodman.otter.core.schema.*
 import java.util.*
 
 abstract class QueryGenerator {

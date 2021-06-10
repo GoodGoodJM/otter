@@ -1,8 +1,8 @@
-package schema
+package com.goodgoodman.otter.schema
 
-import com.goodgoodman.otter.schema.ColumnSchema
-import com.goodgoodman.otter.schema.Constraint
-import com.goodgoodman.otter.schema.TableSchema
+import com.goodgoodman.otter.core.schema.ColumnSchema
+import com.goodgoodman.otter.core.schema.Constraint
+import com.goodgoodman.otter.core.schema.TableSchema
 import org.junit.Test
 import kotlin.test.assertEquals
 

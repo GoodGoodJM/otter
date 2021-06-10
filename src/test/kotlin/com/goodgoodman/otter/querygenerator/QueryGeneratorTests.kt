@@ -1,7 +1,7 @@
-package querygenerator
+package com.goodgoodman.otter.querygenerator
 
-import com.goodgoodman.otter.querygenerator.QueryGenerator
-import com.goodgoodman.otter.schema.*
+import com.goodgoodman.otter.core.querygenerator.QueryGenerator
+import com.goodgoodman.otter.core.schema.*
 import org.junit.Test
 import java.util.*
 import kotlin.test.assertEquals

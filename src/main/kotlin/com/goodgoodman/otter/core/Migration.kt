@@ -1,9 +1,9 @@
-package com.goodgoodman.otter
+package com.goodgoodman.otter.core
 
-import com.goodgoodman.otter.querygenerator.QueryGeneratorManager
-import com.goodgoodman.otter.schema.AlterColumnSchema
-import com.goodgoodman.otter.schema.SchemaMaker
-import com.goodgoodman.otter.schema.TableSchema
+import com.goodgoodman.otter.core.querygenerator.QueryGeneratorManager
+import com.goodgoodman.otter.core.schema.AlterColumnSchema
+import com.goodgoodman.otter.core.schema.SchemaMaker
+import com.goodgoodman.otter.core.schema.TableSchema
 
 abstract class Migration(
     config: OtterConfig

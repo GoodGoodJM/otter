@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.schema
+package com.goodgoodman.otter.core.schema
 
 @DslMarker
 annotation class SchemaMaker()

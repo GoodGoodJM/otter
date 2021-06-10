@@ -1,4 +1,4 @@
-package com.goodgoodman.otter
+package com.goodgoodman.otter.core
 
 import java.sql.DriverManager
 

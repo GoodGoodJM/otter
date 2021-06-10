@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.querygenerator
+package com.goodgoodman.otter.core.querygenerator
 
 object QueryGeneratorManager {
     fun getQueryGeneratorByDriverClassName(driverClassName: String): QueryGenerator {

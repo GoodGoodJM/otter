@@ -1,6 +1,8 @@
-import com.goodgoodman.otter.Migration
-import com.goodgoodman.otter.OtterConfig
-import com.goodgoodman.otter.schema.Constraint
+package com.goodgoodman.otter
+
+import com.goodgoodman.otter.core.Migration
+import com.goodgoodman.otter.core.OtterConfig
+import com.goodgoodman.otter.core.schema.Constraint
 import org.junit.Test
 import kotlin.test.assertEquals
 
