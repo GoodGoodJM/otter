@@ -1,17 +1,15 @@
 package com.goodgoodman.otter
 
 import com.goodgoodman.otter.core.Migration
-import com.goodgoodman.otter.core.OtterConfig
+import com.goodgoodman.otter.core.querygenerator.QueryGeneratorManager
 import com.goodgoodman.otter.core.schema.Constraint
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class MigrationTests {
-    val config = OtterConfig("", "", "", "")
-
     @Test
     fun `Up 실행 시 Schema 들을 처리하여 Query 로 만든뒤 저장해야함`() {
-        val migration = object : Migration(config) {
+        val migration = object : Migration() {
             override fun up() {
                 createTable {
                     name = "person"
@@ -44,13 +42,14 @@ class MigrationTests {
             }
         }
 
+        migration.queryGenerator=QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
         migration.up()
         assertEquals(2, migration.reservedQueries.size)
     }
 
     @Test
     fun `Down 실행 시 Schema 들을 처리하여 Query 로 만든뒤 저장해야함`() {
-        val migration = object : Migration(config) {
+        val migration = object : Migration() {
             override fun up() {
             }
 
@@ -60,6 +59,7 @@ class MigrationTests {
             }
         }
 
+        migration.queryGenerator=QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
         migration.down()
         println(migration.reservedQueries)
         assertEquals(2, migration.reservedQueries.size)

@@ -1,22 +1,21 @@
 package com.goodgoodman.otter.core
 
-import com.goodgoodman.otter.core.querygenerator.QueryGeneratorManager
+import com.goodgoodman.otter.core.querygenerator.QueryGenerator
 import com.goodgoodman.otter.core.schema.AlterColumnSchema
 import com.goodgoodman.otter.core.schema.SchemaMaker
 import com.goodgoodman.otter.core.schema.TableSchema
 
-abstract class Migration(
-    config: OtterConfig
-) {
+abstract class Migration {
     companion object : Logger
 
-    private val queryGenerator = QueryGeneratorManager.getQueryGeneratorByDriverClassName(config.driverClassName)
+    internal lateinit var queryGenerator: QueryGenerator
 
     val reservedQueries: List<String> get() = _reservedQueries
     private val _reservedQueries = mutableListOf<String>()
 
     abstract fun up()
     abstract fun down()
+
 
     @SchemaMaker
     fun createTable(block: TableSchema.() -> Unit) {

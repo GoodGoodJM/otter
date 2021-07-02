@@ -19,3 +19,4 @@ DB Migration Tool for Kotlin. Inspired by [harmonica](https://github.com/KenjiOh
 - [ ] Gradle Plugin - generate
 - [ ] Gradle Plugin - check
 - [ ] Configuration by properties
+- [x] Spring Integration

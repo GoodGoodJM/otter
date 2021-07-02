@@ -13,9 +13,20 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
-    compileOnly(project(":otter-core"))
+    implementation(project(":otter-core"))
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+    }
+    testImplementation(kotlin("script-runtime"))
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
     enabled = false
+}
+
+tasks.withType<org.gradle.jvm.tasks.Jar> {
+    enabled = true
 }
