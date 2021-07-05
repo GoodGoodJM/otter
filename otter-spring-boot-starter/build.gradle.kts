@@ -1,4 +1,5 @@
 plugins {
+    java
     id("org.springframework.boot") version "2.4.4"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     kotlin("jvm")
@@ -14,6 +15,8 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation(project(":otter-core"))
+    implementation(kotlin("test"))
+    implementation(kotlin("test-junit"))
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

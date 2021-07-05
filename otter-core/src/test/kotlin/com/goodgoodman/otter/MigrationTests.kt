@@ -16,7 +16,6 @@ class MigrationTests {
                     column {
                         name = "id"
                         type = "INT UNSIGNED"
-                        setConstraint(Constraint.PRIMARY, Constraint.AUTO_INCREMENT)
                     }
                 }
                 createTable {
