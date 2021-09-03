@@ -45,8 +45,8 @@ class Otter(
     }
 
     private fun loadMigrationFiles(): Array<File> {
-        val directoryURL = this::class.java.classLoader.getResource(migrationPath)!!
-        val directory = Paths.get(directoryURL.path).toFile()
+        val directoryURL = this::class.java.classLoader.getResource(migrationPath)!!.toURI()
+        val directory = Paths.get(directoryURL).toFile()
         return directory.listFiles()!!
     }
 
