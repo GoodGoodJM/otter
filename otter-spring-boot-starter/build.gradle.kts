@@ -21,6 +21,7 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     testImplementation(kotlin("script-runtime"))
+    testImplementation(kotlin("scripting-jsr223"))
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
