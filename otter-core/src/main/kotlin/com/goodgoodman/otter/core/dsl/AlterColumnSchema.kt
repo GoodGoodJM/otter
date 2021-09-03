@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.core.schema
+package com.goodgoodman.otter.core.dsl
 
 import java.util.*
 

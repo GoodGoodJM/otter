@@ -1,16 +1,22 @@
-package com.goodgoodman.otter.core.schema
+package com.goodgoodman.otter.core.dsl.createtable.context.schema
 
+import com.goodgoodman.otter.core.dsl.Constraint
+import com.goodgoodman.otter.core.dsl.SchemaMaker
 import java.util.*
 
-class ColumnSchema {
+class ColumnSchema_ {
     var tableName = ""
     var name = ""
     var type = ""
     val constraints: EnumSet<Constraint> get() = _constraints
     private val _constraints = EnumSet.noneOf(Constraint::class.java)
 
-    val referenceSchemas: List<ReferenceSchema> get() = _referenceSchemas
-    private val _referenceSchemas = mutableListOf<ReferenceSchema>()
+    val referenceSchemas: List<RefeenceSchema_> get() = _referenceSchemas
+    private val _referenceSchemas = mutableListOf<RefeenceSchema_>()
+
+    fun primary() {
+        _constraints.add(Constraint.PRIMARY)
+    }
 
     fun setConstraint(vararg constraints: Constraint) {
         val items = constraints.filter { it !== Constraint.NONE }.toList()
@@ -19,8 +25,8 @@ class ColumnSchema {
     }
 
     @SchemaMaker
-    fun reference(block: ReferenceSchema.() -> Unit) {
-        val referenceSchema = ReferenceSchema()
+    fun reference(block: RefeenceSchema_.() -> Unit) {
+        val referenceSchema = RefeenceSchema_()
         referenceSchema.block()
         referenceSchema.apply {
             fromTable = tableName
@@ -33,3 +39,4 @@ class ColumnSchema {
         return "ColumnSchema(tableName='$tableName', name='$name', type='$type', _constraints=$_constraints, _referenceSchemas=$_referenceSchemas)"
     }
 }
+

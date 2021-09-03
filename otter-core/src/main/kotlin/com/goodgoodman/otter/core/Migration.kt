@@ -1,9 +1,9 @@
 package com.goodgoodman.otter.core
 
 import com.goodgoodman.otter.core.querygenerator.QueryGenerator
-import com.goodgoodman.otter.core.schema.AlterColumnSchema
-import com.goodgoodman.otter.core.schema.SchemaMaker
-import com.goodgoodman.otter.core.schema.TableSchema
+import com.goodgoodman.otter.core.dsl.AlterColumnSchema
+import com.goodgoodman.otter.core.dsl.SchemaMaker
+import com.goodgoodman.otter.core.dsl.createtable.context.schema.TableSchema_
 
 abstract class Migration {
     companion object : Logger
@@ -18,10 +18,10 @@ abstract class Migration {
 
 
     @SchemaMaker
-    fun createTable(block: TableSchema.() -> Unit) {
-        val tableSchema = TableSchema()
+    fun createTable(block: TableSchema_.() -> Unit) {
+        val tableSchema = TableSchema_()
         tableSchema.block()
-        _reservedQueries.add(queryGenerator.resolveTable(tableSchema))
+        // _reservedQueries.add(queryGenerator.resolveTable(tableSchema))
     }
 
     fun dropTable(name: String) {

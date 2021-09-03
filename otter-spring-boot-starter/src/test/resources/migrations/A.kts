@@ -1,15 +1,15 @@
 import com.goodgoodman.otter.core.Migration
-import com.goodgoodman.otter.core.schema.Constraint
 
 object : Migration() {
     override fun up() {
         createTable {
             name = "person"
-            column {
+            val col = column {
                 name = "id"
                 type = "INT"
-                setConstraint(Constraint.PRIMARY)
+                primary()
             }
+
             column {
                 name = "name"
                 type = "VARCHAR(255)"
@@ -20,5 +20,4 @@ object : Migration() {
     override fun down() {
         TODO("Not yet implemented")
     }
-
 }

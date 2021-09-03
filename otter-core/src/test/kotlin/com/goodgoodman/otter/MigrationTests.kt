@@ -1,8 +1,8 @@
 package com.goodgoodman.otter
 
 import com.goodgoodman.otter.core.Migration
+import com.goodgoodman.otter.core.dsl.Constraint
 import com.goodgoodman.otter.core.querygenerator.QueryGeneratorManager
-import com.goodgoodman.otter.core.schema.Constraint
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -42,7 +42,7 @@ class MigrationTests {
             }
         }
 
-        migration.queryGenerator=QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
+        migration.queryGenerator = QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
         migration.up()
         assertEquals(2, migration.reservedQueries.size)
     }
@@ -59,7 +59,7 @@ class MigrationTests {
             }
         }
 
-        migration.queryGenerator=QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
+        migration.queryGenerator = QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
         migration.down()
         println(migration.reservedQueries)
         assertEquals(2, migration.reservedQueries.size)

@@ -1,5 +1,5 @@
 import com.goodgoodman.otter.core.Migration
-import com.goodgoodman.otter.core.schema.Constraint
+import com.goodgoodman.otter.core.dsl.Constraint
 
 object : Migration() {
     override fun up() {

@@ -1,6 +1,6 @@
-package com.goodgoodman.otter.core.schema
+package com.goodgoodman.otter.core.dsl.createtable.context.schema
 
-class ReferenceSchema {
+class RefeenceSchema_ {
     var key = ""
     var fromTable = ""
     var fromColumn = ""
