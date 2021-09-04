@@ -1,17 +1,14 @@
 import com.goodgoodman.otter.core.Migration
+import com.goodgoodman.otter.core.dsl.Constraint
 
 object : Migration() {
     override fun up() {
-        createTable {
-            name = "person"
-            val col = column {
-                name = "id"
+        createTable("person") {
+            column("id") {
                 type = "INT"
-                primary()
-            }
+            } constraints Constraint.PRIMARY
 
-            column {
-                name = "name"
+            column("name") {
                 type = "VARCHAR(255)"
             }
         }

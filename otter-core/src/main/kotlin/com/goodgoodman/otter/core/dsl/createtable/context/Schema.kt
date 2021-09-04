@@ -12,4 +12,5 @@ data class ColumnSchema(
 
 data class ForeignKeySchema(
     var reference: String = "",
+    var key: String = "",
 )

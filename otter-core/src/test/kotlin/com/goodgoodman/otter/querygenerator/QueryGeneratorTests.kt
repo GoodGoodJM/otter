@@ -25,7 +25,7 @@ class QueryGeneratorTests {
     fun `Resolve a table which has multiple column schemas`() {
         val queryGenerator = object : QueryGenerator() {}
 
-        val tableContext = CreateTableContext(TableSchema("table")).apply {
+        val tableContext = CreateTableContext(TableSchema("table_name")).apply {
             column("id") {
                 type = "INT UNSIGNED"
             } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
@@ -36,7 +36,7 @@ class QueryGeneratorTests {
         }
 
         val expectedQuery = """
-                |CREATE TABLE table (
+                |CREATE TABLE table_name (
                 |    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 |    temp_id INT UNSIGNED NOT NULL UNIQUE
                 |)
@@ -45,6 +45,70 @@ class QueryGeneratorTests {
         assertEquals(expectedQuery, actualQuery)
     }
 
+    @Test
+    fun `Resolve a table which has a reference`() {
+        val queryGenerator = object : QueryGenerator() {}
+
+        val tableContext = CreateTableContext(TableSchema("table_name")).apply {
+            column("id") {
+                type = "INT UNSIGNED"
+            } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
+
+            column("temp_id") {
+                type = "INT UNSIGNED"
+            } foreignKey {
+                key = "fk_temp"
+                reference = "temp(id)"
+            }
+        }
+
+        val expectedQuery = """
+                |CREATE TABLE table_name (
+                |    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                |    temp_id INT UNSIGNED,
+                |    CONSTRAINT fk_temp FOREIGN KEY (temp_id)
+                |    REFERENCES temp(id)
+                |)
+            """.trimMargin()
+        val actualQuery = queryGenerator.generateCreateTable(tableContext)
+        assertEquals(expectedQuery, actualQuery)
+    }
+
+    @Test
+    fun `Resolve a table which has references`() {
+        val queryGenerator = object : QueryGenerator() {}
+
+        val tableContext = CreateTableContext(TableSchema("table_name")).apply {
+            column("id") {
+                type = "INT UNSIGNED"
+            } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
+
+            column("temp_id") {
+                type = "INT UNSIGNED"
+            } foreignKey {
+                key = "fk_temp"
+                reference = "temp(id)"
+            }
+
+            column("temptemp_id") {
+                type = "INT UNSIGNED"
+            } foreignKey { reference = "temptemp(id)" }
+        }
+
+        val expectedQuery = """
+                |CREATE TABLE table_name (
+                |    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                |    temp_id INT UNSIGNED,
+                |    temptemp_id INT UNSIGNED,
+                |    CONSTRAINT fk_temp FOREIGN KEY (temp_id)
+                |    REFERENCES temp(id),
+                |    CONSTRAINT fk_table_name_temptemp_temptemp_id FOREIGN KEY (temptemp_id)
+                |    REFERENCES temptemp(id)
+                |)
+            """.trimMargin()
+        val actualQuery = queryGenerator.generateCreateTable(tableContext)
+        assertEquals(expectedQuery, actualQuery)
+    }
 
     @Test
     fun `Drop table`() {

@@ -3,27 +3,20 @@ import com.goodgoodman.otter.core.dsl.Constraint
 
 object : Migration() {
     override fun up() {
-        createTable {
-            name = "user"
-            column {
-                name = "id"
+        createTable("user") {
+
+            column("id") {
                 type = "INT"
-                setConstraint(Constraint.PRIMARY)
-            }
-            column {
-                name = "person_id"
-                type = " INT"
-                reference {
-                    toTable = "person"
-                    toColumn = "id"
-                    key = "fk_user_person"
-                }
-            }
+            } constraints Constraint.PRIMARY
+
+            column("person_id") {
+                type = "INT"
+            } foreignKey { reference = "person(id)" }
         }
     }
 
     override fun down() {
-        TODO("Not yet implemented")
+        dropTable("user")
     }
-
 }
+

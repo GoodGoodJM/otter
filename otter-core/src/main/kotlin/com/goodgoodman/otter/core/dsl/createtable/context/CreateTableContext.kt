@@ -23,7 +23,8 @@ class CreateTableContext(tableSchema: TableSchema) {
     }
 
     class ForeignKeyContext(foreignKeySchema: ForeignKeySchema) {
-        var reference: String = foreignKeySchema.reference
+        val key: String = foreignKeySchema.key
+        val reference: String = foreignKeySchema.reference
     }
 
     class ColumnContext(columnSchema: ColumnSchema) {

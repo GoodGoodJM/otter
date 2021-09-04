@@ -29,9 +29,9 @@ class AutoConfigurationApplicationTests {
     fun TEMP() {
         contextRunner.withPropertyValues(
             "otter.driverClassName=org.mariadb.jdbc.Driver",
-            "otter.url=jdbc:mariadb://localhost:3309/otter",
+            "otter.url=jdbc:mariadb://localhost:13306/temp",
             "otter.username=root",
-            "otter.password=hb6332!@",
+            "otter.password=good9006())^",
             "otter.migrationPath=migrations",
             "otter.showSql=true",
         ).run { context ->

@@ -7,6 +7,9 @@ import com.goodgoodman.otter.core.querygenerator.exception.UnsupportedAlterColum
 import java.util.*
 
 abstract class QueryGenerator {
+    companion object {
+        val REGEX = """([\w]+)\([\w]+\)""".toRegex()
+    }
 
     fun resolveConstraints(constraints: EnumSet<Constraint>): String {
         return constraints.joinToString(" ", transform = this::resolveConstraint)
@@ -22,15 +25,28 @@ abstract class QueryGenerator {
 
     fun generateCreateTable(tableContext: CreateTableContext): String {
         var body = tableContext.columnContexts.joinToString(",\n    ") {
-            "${it.name} ${it.type} ${resolveConstraints(it.constraints)}"
-        }
-        val foreignKeys = tableContext.columnContexts
-            .filter { it.foreignKeyContext != null }
-            .map { it.foreignKeyContext }
-        if (foreignKeys.isNotEmpty()) {
-            val foreignKeyBody = foreignKeys.joinToString(",\n    ") {
-                """""".trimMargin()
+            var columnQuery = "${it.name} ${it.type}"
+            if (it.constraints.isNotEmpty()) {
+                columnQuery = "$columnQuery ${resolveConstraints(it.constraints)}"
             }
+            return@joinToString columnQuery
+        }
+
+        val foreignKeyBody = tableContext.columnContexts
+            .filter { it.foreignKeyContext != null }
+            .joinToString(",\n    ") {
+                val foreignKeyContext = it.foreignKeyContext!!
+                val key = foreignKeyContext.key.ifEmpty {
+                    val (targetTable) = REGEX.find(foreignKeyContext.reference)!!.destructured
+                    "fk_${tableContext.name}_${targetTable}_${it.name}"
+                }
+
+                """
+                   |CONSTRAINT $key FOREIGN KEY (${it.name})
+                   |    REFERENCES ${foreignKeyContext.reference}
+                """.trimMargin()
+            }
+        if (foreignKeyBody.isNotEmpty()) {
             body = """
                 |$body,
                 |    $foreignKeyBody
