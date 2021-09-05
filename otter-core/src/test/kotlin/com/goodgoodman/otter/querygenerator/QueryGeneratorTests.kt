@@ -2,9 +2,11 @@ package com.goodgoodman.otter.querygenerator
 
 import com.goodgoodman.otter.core.dsl.AlterColumnSchema
 import com.goodgoodman.otter.core.dsl.Constraint
+import com.goodgoodman.otter.core.dsl.altertable.AlterTableContext
+import com.goodgoodman.otter.core.dsl.altertable.TableSchema as AlterTableSchema
 import com.goodgoodman.otter.core.dsl.and
-import com.goodgoodman.otter.core.dsl.createtable.context.CreateTableContext
-import com.goodgoodman.otter.core.dsl.createtable.context.TableSchema
+import com.goodgoodman.otter.core.dsl.createtable.CreateTableContext
+import com.goodgoodman.otter.core.dsl.createtable.TableSchema as CreateTableSchema
 import com.goodgoodman.otter.core.querygenerator.QueryGenerator
 import org.junit.Test
 import java.util.*
@@ -25,7 +27,7 @@ class QueryGeneratorTests {
     fun `Resolve a table which has multiple column schemas`() {
         val queryGenerator = object : QueryGenerator() {}
 
-        val tableContext = CreateTableContext(TableSchema("table_name")).apply {
+        val tableContext = CreateTableContext(CreateTableSchema("table_name")).apply {
             column("id") {
                 type = "INT UNSIGNED"
             } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
@@ -49,7 +51,7 @@ class QueryGeneratorTests {
     fun `Resolve a table which has a reference`() {
         val queryGenerator = object : QueryGenerator() {}
 
-        val tableContext = CreateTableContext(TableSchema("table_name")).apply {
+        val tableContext = CreateTableContext(CreateTableSchema("table_name")).apply {
             column("id") {
                 type = "INT UNSIGNED"
             } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
@@ -78,7 +80,7 @@ class QueryGeneratorTests {
     fun `Resolve a table which has references`() {
         val queryGenerator = object : QueryGenerator() {}
 
-        val tableContext = CreateTableContext(TableSchema("table_name")).apply {
+        val tableContext = CreateTableContext(CreateTableSchema("table_name")).apply {
             column("id") {
                 type = "INT UNSIGNED"
             } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
@@ -134,6 +136,22 @@ class QueryGeneratorTests {
             |ADD ${addColumnSchema.name} ${addColumnSchema.type} ${queryGenerator.resolveConstraints(addColumnSchema.constraints)}
         """.trimMargin()
         val actualQuery = queryGenerator.resolveAlterColumn(addColumnSchema)
+        println(actualQuery)
+        assertEquals(expectedQuery, actualQuery)
+    }
+
+    @Test
+    fun `Add column1`() {
+        val queryGenerator = object : QueryGenerator() {}
+        val addColumnContext = AlterTableContext(AlterTableSchema("person")).addColumn("name") {
+            type = "varchar(255)"
+        } constraints Constraint.NOT_NULL
+
+        val expectedQuery = """
+            |ALTER TABLE person
+            |ADD name varchar(255) NOT NULL
+        """.trimMargin()
+        val actualQuery = queryGenerator.resolveAlterColumn(addColumnContext)
         println(actualQuery)
         assertEquals(expectedQuery, actualQuery)
     }

@@ -3,8 +3,8 @@ package com.goodgoodman.otter.core
 import com.goodgoodman.otter.core.querygenerator.QueryGenerator
 import com.goodgoodman.otter.core.dsl.AlterColumnSchema
 import com.goodgoodman.otter.core.dsl.SchemaMaker
-import com.goodgoodman.otter.core.dsl.createtable.context.CreateTableContext
-import com.goodgoodman.otter.core.dsl.createtable.context.TableSchema
+import com.goodgoodman.otter.core.dsl.createtable.CreateTableContext
+import com.goodgoodman.otter.core.dsl.createtable.TableSchema
 
 abstract class Migration {
     companion object : Logger

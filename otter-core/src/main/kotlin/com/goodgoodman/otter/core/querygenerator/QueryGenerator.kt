@@ -2,7 +2,8 @@ package com.goodgoodman.otter.core.querygenerator
 
 import com.goodgoodman.otter.core.dsl.AlterColumnSchema
 import com.goodgoodman.otter.core.dsl.Constraint
-import com.goodgoodman.otter.core.dsl.createtable.context.CreateTableContext
+import com.goodgoodman.otter.core.dsl.altertable.AlterTableContext
+import com.goodgoodman.otter.core.dsl.createtable.CreateTableContext
 import com.goodgoodman.otter.core.querygenerator.exception.UnsupportedAlterColumnTypeException
 import java.util.*
 
@@ -76,5 +77,13 @@ abstract class QueryGenerator {
             |DROP COLUMN ${alterColumnSchema.name}
         """.trimMargin()
         else -> throw UnsupportedAlterColumnTypeException(alterColumnSchema)
+    }
+
+    fun resolveAlterColumn(alterTableContext: AlterTableContext): String {
+        val columnContext = alterTableContext.columnContext
+        return """
+            |ALTER TABLE ${alterTableContext.name}
+            |ADD ${columnContext.name}
+        """.trimMargin()
     }
 }

@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.core.dsl.createtable.context
+package com.goodgoodman.otter.core.dsl.createtable
 
 import com.goodgoodman.otter.core.dsl.Constraint
 import com.goodgoodman.otter.core.dsl.SchemaMaker

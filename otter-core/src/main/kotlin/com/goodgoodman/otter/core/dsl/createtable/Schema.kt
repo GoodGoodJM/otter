@@ -1,11 +1,11 @@
-package com.goodgoodman.otter.core.dsl.createtable.context
+package com.goodgoodman.otter.core.dsl.createtable
 
 data class TableSchema(
     val name: String,
 )
 
 data class ColumnSchema(
-    var name: String,
+    val name: String,
     var type: String = "",
     var comment: String = "",
 )
