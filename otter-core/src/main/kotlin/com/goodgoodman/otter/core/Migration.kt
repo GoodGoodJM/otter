@@ -1,7 +1,7 @@
 package com.goodgoodman.otter.core
 
-import com.goodgoodman.otter.core.querygenerator.QueryGenerator
 import com.goodgoodman.otter.core.dsl.AlterColumnSchema
+import com.goodgoodman.otter.core.dsl.SchemaContext
 import com.goodgoodman.otter.core.dsl.SchemaMaker
 import com.goodgoodman.otter.core.dsl.createtable.CreateTableContext
 import com.goodgoodman.otter.core.dsl.createtable.TableSchema
@@ -9,10 +9,8 @@ import com.goodgoodman.otter.core.dsl.createtable.TableSchema
 abstract class Migration {
     companion object : Logger
 
-    internal lateinit var queryGenerator: QueryGenerator
-
-    val reservedQueries: List<String> get() = _reservedQueries
-    private val _reservedQueries = mutableListOf<String>()
+    val contexts: List<SchemaContext> get() = _contexts
+    private val _contexts = mutableListOf<SchemaContext>()
 
     abstract fun up()
     abstract fun down()
@@ -22,15 +20,15 @@ abstract class Migration {
     fun createTable(name: String, block: CreateTableContext.() -> Unit) {
         val tableSchema = TableSchema(name)
         val tableContext = CreateTableContext(tableSchema).apply(block)
-        _reservedQueries.add(queryGenerator.generateCreateTable(tableContext))
+        _contexts.add(tableContext)
     }
 
     fun dropTable(name: String) {
-        _reservedQueries.add(queryGenerator.dropTable(name))
+        // _contexts.add(queryGenerator.dropTable(name))
     }
 
     fun rawQuery(sql: String) {
-        _reservedQueries.add(sql)
+        // _contexts.add(sql)
     }
 
     fun addColumn(block: AlterColumnSchema.() -> Unit) = alterColumn(AlterColumnSchema.Type.ADD, block)
@@ -41,6 +39,6 @@ abstract class Migration {
         val alterColumnSchema = AlterColumnSchema()
         alterColumnSchema.alterType = type
         alterColumnSchema.block()
-        _reservedQueries.add(queryGenerator.resolveAlterColumn(alterColumnSchema))
+        // _contexts.add(alterColumnSchema)
     }
 }

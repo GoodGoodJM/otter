@@ -44,7 +44,7 @@ class MigrationTests {
 
         migration.queryGenerator = QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
         migration.up()
-        assertEquals(2, migration.reservedQueries.size)
+        assertEquals(2, migration.contexts.size)
     }
 
     @Test
@@ -61,7 +61,7 @@ class MigrationTests {
 
         migration.queryGenerator = QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
         migration.down()
-        println(migration.reservedQueries)
-        assertEquals(2, migration.reservedQueries.size)
+        println(migration.contexts)
+        assertEquals(2, migration.contexts.size)
     }
 }

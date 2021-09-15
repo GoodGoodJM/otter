@@ -1,9 +1,10 @@
 package com.goodgoodman.otter.core.dsl.altertable
 
 import com.goodgoodman.otter.core.dsl.Constraint
+import com.goodgoodman.otter.core.dsl.SchemaContext
 import com.goodgoodman.otter.core.dsl.SchemaMaker
 
-class AlterTableContext(tableSchema: TableSchema) {
+class AlterTableContext(tableSchema: TableSchema) : SchemaContext {
     val name = tableSchema.name
     lateinit var columnContext: ColumnContext
 
