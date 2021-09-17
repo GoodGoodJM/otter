@@ -5,6 +5,7 @@ import com.goodgoodman.otter.core.dsl.SchemaContext
 import com.goodgoodman.otter.core.dsl.SchemaMaker
 import com.goodgoodman.otter.core.dsl.createtable.CreateTableContext
 import com.goodgoodman.otter.core.dsl.createtable.TableSchema
+import org.jetbrains.exposed.sql.Table
 
 abstract class Migration {
     companion object : Logger
@@ -27,7 +28,7 @@ abstract class Migration {
 
     fun dropTable(name: String) {
         _contexts.add(object : SchemaContext {
-            override fun resolve(): List<String> = listOf("DROP TABLE $name")
+            override fun resolve(): List<String> = Table(name).dropStatement()
         })
     }
 

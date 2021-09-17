@@ -18,7 +18,7 @@ class Otter(
         fun from(config: OtterConfig) = Otter(config)
     }
 
-    fun up() {
+    private fun migrationScope(block: Transaction.() -> Unit) {
         logger.info("Start migration.")
         val database = Database.connect(
             config.url,
@@ -28,11 +28,15 @@ class Otter(
         )
 
         transaction {
-            MigrationProcess(this, config.migrationPath, config.showSql).exec()
+            block()
         }
 
         logger.info("Success migration.")
         TransactionManager.closeAndUnregister(database)
+    }
+
+    fun up() = migrationScope {
+        MigrationProcess(this, config.migrationPath, config.showSql).exec()
     }
 }
 
