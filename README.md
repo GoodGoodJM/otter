@@ -11,12 +11,13 @@ DB Migration Tool for Kotlin. Inspired by [harmonica](https://github.com/KenjiOh
 - [X] ForeignKey
 - [X] Add Column, Drop Column
 - [X] Raw query
-- [ ] Modify Constraints
+- [X] Modify Constraints
 - [ ] Type Support
 - [ ] Gradle Plugin - migrate
-- [ ] Support H2
+- [X] Support H2
 - [ ] Gradle Plugin - rollback
 - [ ] Gradle Plugin - generate
 - [ ] Gradle Plugin - check
 - [x] Configuration by properties
 - [x] Spring Integration
+- [x] Migrate to Exposed

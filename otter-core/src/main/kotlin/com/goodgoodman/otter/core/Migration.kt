@@ -12,6 +12,8 @@ abstract class Migration {
     val contexts: List<SchemaContext> get() = _contexts
     private val _contexts = mutableListOf<SchemaContext>()
 
+    open val comment: String = ""
+
     abstract fun up()
     abstract fun down()
 
@@ -24,11 +26,15 @@ abstract class Migration {
     }
 
     fun dropTable(name: String) {
-        // _contexts.add(queryGenerator.dropTable(name))
+        _contexts.add(object : SchemaContext {
+            override fun resolve(): List<String> = listOf("DROP TABLE $name")
+        })
     }
 
     fun rawQuery(sql: String) {
-        // _contexts.add(sql)
+        _contexts.add(object : SchemaContext {
+            override fun resolve(): List<String> = listOf(sql)
+        })
     }
 
     fun addColumn(block: AlterColumnSchema.() -> Unit) = alterColumn(AlterColumnSchema.Type.ADD, block)

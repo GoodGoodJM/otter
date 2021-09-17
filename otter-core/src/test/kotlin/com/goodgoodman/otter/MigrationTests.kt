@@ -2,7 +2,7 @@ package com.goodgoodman.otter
 
 import com.goodgoodman.otter.core.Migration
 import com.goodgoodman.otter.core.dsl.Constraint
-import com.goodgoodman.otter.core.querygenerator.QueryGeneratorManager
+import com.goodgoodman.otter.core.dsl.and
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -11,30 +11,18 @@ class MigrationTests {
     fun `Up 실행 시 Schema 들을 처리하여 Query 로 만든뒤 저장해야함`() {
         val migration = object : Migration() {
             override fun up() {
-                createTable {
-                    name = "person"
-                    column {
-                        name = "id"
+                createTable("person") {
+                    column("id") {
                         type = "INT UNSIGNED"
-                        setConstraint(Constraint.PRIMARY, Constraint.AUTO_INCREMENT)
-                    }
+                    } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
                 }
-                createTable {
-                    name = "post"
-                    column {
-                        name = "id"
+                createTable("post") {
+                    column("id") {
                         type = "INT UNSIGNED"
-                        setConstraint(Constraint.PRIMARY, Constraint.AUTO_INCREMENT)
-                    }
-                    column {
-                        name = "person_id"
+                    } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
+                    column("person_id") {
                         type = "INT UNSIGNED"
-                        reference {
-                            toTable = "person"
-                            toColumn = "id"
-                            key = "fk_post_person_id"
-                        }
-                    }
+                    } foreignKey { reference = "person(id)" }
                 }
             }
 
@@ -42,7 +30,6 @@ class MigrationTests {
             }
         }
 
-        migration.queryGenerator = QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
         migration.up()
         assertEquals(2, migration.contexts.size)
     }
@@ -59,7 +46,6 @@ class MigrationTests {
             }
         }
 
-        migration.queryGenerator = QueryGeneratorManager.getQueryGeneratorByDriverClassName("")
         migration.down()
         println(migration.contexts)
         assertEquals(2, migration.contexts.size)

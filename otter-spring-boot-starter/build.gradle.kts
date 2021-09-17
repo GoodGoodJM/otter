@@ -22,6 +22,9 @@ dependencies {
     }
     testImplementation(kotlin("script-runtime"))
     testImplementation(kotlin("scripting-jsr223"))
+
+    testImplementation("com.h2database:h2:1.4.200")
+    testImplementation("ch.qos.logback:logback-classic:1.2.5")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {

@@ -31,4 +31,8 @@ class AlterTableContext(tableSchema: TableSchema) : SchemaContext {
     class ColumnContext(columnSchema: AddColumnSchema) {
         val name = columnSchema.name
     }
+
+    override fun resolve(): List<String> {
+        TODO("Not yet implemented")
+    }
 }

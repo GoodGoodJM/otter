@@ -28,7 +28,7 @@ class Otter(
         )
 
         transaction {
-            MigrationProcess(this, config.migrationPath).exec()
+            MigrationProcess(this, config.migrationPath, config.showSql).exec()
         }
 
         logger.info("Success migration.")
@@ -39,7 +39,7 @@ class Otter(
 object MigrationTable : IntIdTable("otter_migration") {
     val filename = varchar("filename", 255).uniqueIndex()
     val comment = varchar("comment", 255)
-    val createdAt = datetime("created_at").defaultExpression(CurrentDateTime())
+    private val createdAt = datetime("created_at").defaultExpression(CurrentDateTime())
 
     fun last() = selectAll().orderBy(createdAt to SortOrder.DESC).firstOrNull()
 }
@@ -47,6 +47,7 @@ object MigrationTable : IntIdTable("otter_migration") {
 class MigrationProcess(
     private val transaction: Transaction,
     private val migrationPath: String,
+    private val showSql: Boolean,
 ) {
     companion object : Logger
 
@@ -76,16 +77,20 @@ class MigrationProcess(
 
         val migrations = loadMigrations()
         for ((name, migration) in migrations) {
-            if (latestFilename > name) {
+            if (latestFilename >= name) {
                 logger.debug("$name is already migrated, will be skipped.")
                 continue
             }
 
             migration.up()
-            // migration.contexts.forEach(transaction::exec)
+            migration.contexts.flatMap { it.resolve() }.forEach {
+                if (showSql) logger.info(it)
+                transaction.exec(it)
+            }
+
             MigrationTable.insert {
                 it[filename] = name
-                it[comment] = ""
+                it[comment] = migration.comment
             }
 
             transaction.commit()

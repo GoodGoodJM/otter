@@ -2,6 +2,8 @@ import com.goodgoodman.otter.core.Migration
 import com.goodgoodman.otter.core.dsl.Constraint
 
 object : Migration() {
+    override val comment = "Create user"
+
     override fun up() {
         createTable("user") {
 
@@ -11,7 +13,7 @@ object : Migration() {
 
             column("person_id") {
                 type = "INT"
-            } foreignKey { reference = "person(id)" }
+            } constraints Constraint.NOT_NULL foreignKey { reference = "person(id)" }
         }
     }
 

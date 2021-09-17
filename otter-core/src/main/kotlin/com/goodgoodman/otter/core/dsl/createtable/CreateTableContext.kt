@@ -3,45 +3,59 @@ package com.goodgoodman.otter.core.dsl.createtable
 import com.goodgoodman.otter.core.dsl.Constraint
 import com.goodgoodman.otter.core.dsl.SchemaContext
 import com.goodgoodman.otter.core.dsl.SchemaMaker
-import com.goodgoodman.otter.core.querygenerator.QueryGenerator
 import org.jetbrains.exposed.sql.ColumnType
-import org.jetbrains.exposed.sql.ForeignKeyConstraint
 import org.jetbrains.exposed.sql.Table
 import java.util.*
 
 class CreateTableContext(tableSchema: TableSchema) : SchemaContext {
     companion object {
-        val REGEX = """([\w]+)\([\w]+\)""".toRegex()
+        val REGEX = """([\w]+)\(([\w]+)\)""".toRegex()
     }
 
-    val table = Table(tableSchema.name)
+    val name = tableSchema.name
+
+    val columnContexts: List<ColumnContext> get() = _columnContexts
+    private val _columnContexts = mutableListOf<ColumnContext>()
+
+
+    override fun resolve(): List<String> {
+        val table = Table(name)
+        with(table) {
+            columnContexts.forEach { columnContext ->
+                val columnType = when (val type: Any = columnContext.type) {
+                    is String -> object : ColumnType() {
+                        override var nullable: Boolean = true
+                        override fun sqlType(): String = type
+                    }
+                    else -> throw Exception("ColumnType($type) is not supported")
+                }
+                var column = table.registerColumn<Comparable<Any>>(columnContext.name, columnType)
+                columnContext.constraints.forEach { constraint ->
+                    column = when (constraint) {
+                        Constraint.PRIMARY -> column.apply {
+                            this.indexInPK = columns.count { it.indexInPK != null } + 1
+                        }
+                        Constraint.NOT_NULL -> column.apply { columnType.nullable = false }
+                        Constraint.AUTO_INCREMENT -> column.autoIncrement()
+                        Constraint.UNIQUE -> column.uniqueIndex()
+                        else -> throw Exception("Constraint($constraint) is not supported")
+                    }
+                }
+
+                if (columnContext.foreignKeyContext != null) {
+                    val foreignKeyContext = columnContext.foreignKeyContext!!
+                    val (targetTableName, targetColumnName) = REGEX.find(foreignKeyContext.reference)!!.destructured
+                    val targetColumn = Table(targetTableName)
+                        .registerColumn<Comparable<Any>>(targetColumnName, column.columnType)
+                    column.references(targetColumn)
+                }
+            }
+        }
+        return table.ddl
+    }
 
     private fun registerColumn(columnContext: ColumnContext) {
-        val columnType = when (val type: Any = columnContext.type) {
-            is String -> object : ColumnType() {
-                override fun sqlType(): String = type
-            }
-            else -> throw Exception("ColumnType($type) is not supported")
-        }
-        val column = table.registerColumn<Any>(columnContext.name, columnType)
-        if (columnContext.foreignKeyContext != null) {
-            val foreignKeyContext = columnContext.foreignKeyContext!!
-            val (targetTable, targetColumnName) = QueryGenerator.REGEX.find(foreignKeyContext.reference)!!.destructured
-            val targetColumn = Table(targetTable).registerColumn<Any>(targetColumnName, column.columnType)
-            column.foreignKey = ForeignKeyConstraint(
-                target = targetColumn,
-                from = column,
-                onUpdate = null,
-                onDelete = null,
-                name = foreignKeyContext.key.ifEmpty { null },
-            )
-        }
-        columnContext.constraints.forEach {
-            when(it) {
-                Constraint.NOT_NULL -> column.nullb
-                else -> throw Exception("??")
-            }
-        }
+        _columnContexts.add(columnContext)
     }
 
     @SchemaMaker
