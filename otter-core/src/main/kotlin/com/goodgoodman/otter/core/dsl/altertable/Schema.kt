@@ -7,5 +7,4 @@ data class TableSchema(
 data class AddColumnSchema(
     val name: String,
     var type: String,
-    var comment: String = "",
 )

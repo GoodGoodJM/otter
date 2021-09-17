@@ -32,9 +32,7 @@ class CreateTableContext(tableSchema: TableSchema) : SchemaContext {
                 var column = table.registerColumn<Comparable<Any>>(columnContext.name, columnType)
                 columnContext.constraints.forEach { constraint ->
                     column = when (constraint) {
-                        Constraint.PRIMARY -> column.apply {
-                            this.indexInPK = columns.count { it.indexInPK != null } + 1
-                        }
+                        Constraint.PRIMARY -> column.apply { indexInPK = columns.count { it.indexInPK != null } + 1 }
                         Constraint.NOT_NULL -> column.apply { columnType.nullable = false }
                         Constraint.AUTO_INCREMENT -> column.autoIncrement()
                         Constraint.UNIQUE -> column.uniqueIndex()
@@ -47,7 +45,7 @@ class CreateTableContext(tableSchema: TableSchema) : SchemaContext {
                     val (targetTableName, targetColumnName) = REGEX.find(foreignKeyContext.reference)!!.destructured
                     val targetColumn = Table(targetTableName)
                         .registerColumn<Comparable<Any>>(targetColumnName, column.columnType)
-                    column.references(targetColumn)
+                    column.references(targetColumn, fkName = foreignKeyContext.key.ifEmpty { null })
                 }
             }
         }
@@ -74,7 +72,6 @@ class CreateTableContext(tableSchema: TableSchema) : SchemaContext {
     class ColumnContext(columnSchema: ColumnSchema) {
         val name = columnSchema.name
         val type = columnSchema.type
-        val comment = columnSchema.comment
 
         var foreignKeyContext: ForeignKeyContext? = null
 

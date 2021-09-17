@@ -7,7 +7,6 @@ data class TableSchema(
 data class ColumnSchema(
     val name: String,
     var type: String = "",
-    var comment: String = "",
 )
 
 data class ForeignKeySchema(
