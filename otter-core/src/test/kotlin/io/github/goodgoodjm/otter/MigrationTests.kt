@@ -1,8 +1,8 @@
-package com.goodgoodman.otter
+package io.github.goodgoodjm.otter
 
-import com.goodgoodman.otter.core.Migration
-import com.goodgoodman.otter.core.dsl.Constraint
-import com.goodgoodman.otter.core.dsl.and
+import io.github.goodgoodjm.otter.core.Migration
+import io.github.goodgoodjm.otter.core.dsl.Constraint
+import io.github.goodgoodjm.otter.core.dsl.and
 import org.junit.Test
 import kotlin.test.assertEquals
 

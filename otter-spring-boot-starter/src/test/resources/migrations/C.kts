@@ -1,5 +1,5 @@
-import com.goodgoodman.otter.core.Migration
-import com.goodgoodman.otter.core.dsl.Constraint
+import io.github.goodgoodjm.otter.core.Migration
+import io.github.goodgoodjm.otter.core.dsl.Constraint
 
 object : Migration() {
     override val comment = "Raw query test"

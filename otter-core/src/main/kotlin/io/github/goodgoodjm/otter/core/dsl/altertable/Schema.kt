@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.core.dsl.altertable
+package io.github.goodgoodjm.otter.core.dsl.altertable
 
 data class TableSchema(
     val name: String,

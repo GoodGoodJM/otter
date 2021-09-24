@@ -1,10 +1,10 @@
-package com.goodgoodman.otter.core
+package io.github.goodgoodjm.otter.core
 
-import com.goodgoodman.otter.core.dsl.AlterColumnSchema
-import com.goodgoodman.otter.core.dsl.SchemaContext
-import com.goodgoodman.otter.core.dsl.SchemaMaker
-import com.goodgoodman.otter.core.dsl.createtable.CreateTableContext
-import com.goodgoodman.otter.core.dsl.createtable.TableSchema
+import io.github.goodgoodjm.otter.core.dsl.AlterColumnSchema
+import io.github.goodgoodjm.otter.core.dsl.SchemaContext
+import io.github.goodgoodjm.otter.core.dsl.SchemaMaker
+import io.github.goodgoodjm.otter.core.dsl.createtable.CreateTableContext
+import io.github.goodgoodjm.otter.core.dsl.createtable.TableSchema
 import org.jetbrains.exposed.sql.Table
 
 abstract class Migration {

@@ -1,4 +1,4 @@
-package com.goodgoodman.otter
+package io.github.goodgoodjm.otter
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding

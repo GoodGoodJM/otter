@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.core.dsl
+package io.github.goodgoodjm.otter.core.dsl
 
 import java.util.*
 

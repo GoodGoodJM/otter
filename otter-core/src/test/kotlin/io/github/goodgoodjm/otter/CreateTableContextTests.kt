@@ -1,8 +1,8 @@
-package com.goodgoodman.otter
+package io.github.goodgoodjm.otter
 
-import com.goodgoodman.otter.core.dsl.Constraint
-import com.goodgoodman.otter.core.dsl.createtable.CreateTableContext
-import com.goodgoodman.otter.core.dsl.createtable.TableSchema
+import io.github.goodgoodjm.otter.core.dsl.Constraint
+import io.github.goodgoodjm.otter.core.dsl.createtable.CreateTableContext
+import io.github.goodgoodjm.otter.core.dsl.createtable.TableSchema
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.Test

@@ -9,8 +9,8 @@ repositories {
 }
 
 allprojects {
-    group = "com.goodgoodman"
-    version = "1.0.0"
+    group = "io.github.goodgoodjm"
+    version = "0.0.1"
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {

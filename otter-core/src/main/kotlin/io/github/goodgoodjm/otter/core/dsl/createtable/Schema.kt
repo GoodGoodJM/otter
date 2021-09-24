@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.core.dsl.createtable
+package io.github.goodgoodjm.otter.core.dsl.createtable
 
 data class TableSchema(
     val name: String,

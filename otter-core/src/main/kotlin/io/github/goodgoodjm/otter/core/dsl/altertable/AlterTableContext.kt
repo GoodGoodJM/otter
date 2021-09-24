@@ -1,8 +1,8 @@
-package com.goodgoodman.otter.core.dsl.altertable
+package io.github.goodgoodjm.otter.core.dsl.altertable
 
-import com.goodgoodman.otter.core.dsl.Constraint
-import com.goodgoodman.otter.core.dsl.SchemaContext
-import com.goodgoodman.otter.core.dsl.SchemaMaker
+import io.github.goodgoodjm.otter.core.dsl.Constraint
+import io.github.goodgoodjm.otter.core.dsl.SchemaContext
+import io.github.goodgoodjm.otter.core.dsl.SchemaMaker
 
 class AlterTableContext(tableSchema: TableSchema) : SchemaContext {
     val name = tableSchema.name
