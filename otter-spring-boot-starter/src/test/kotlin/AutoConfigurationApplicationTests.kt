@@ -1,4 +1,4 @@
-import com.goodgoodman.otter.OtterAutoConfiguration
+import io.github.goodgoodjm.otter.OtterAutoConfiguration
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.autoconfigure.AutoConfigurations

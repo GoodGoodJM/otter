@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.core
+package io.github.goodgoodjm.otter.core
 
 class OtterConfig(
     val migrationPath: String,

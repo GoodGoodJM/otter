@@ -1,4 +1,4 @@
-package com.goodgoodman.otter.core
+package io.github.goodgoodjm.otter.core
 
 import org.slf4j.LoggerFactory
 

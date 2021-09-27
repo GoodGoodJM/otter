@@ -1,7 +1,7 @@
-package com.goodgoodman.otter
+package io.github.goodgoodjm.otter
 
-import com.goodgoodman.otter.core.Logger
-import com.goodgoodman.otter.core.OtterConfig
+import io.github.goodgoodjm.otter.core.Logger
+import io.github.goodgoodjm.otter.core.OtterConfig
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

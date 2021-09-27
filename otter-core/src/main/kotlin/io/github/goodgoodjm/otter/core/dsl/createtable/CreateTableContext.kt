@@ -1,8 +1,8 @@
-package com.goodgoodman.otter.core.dsl.createtable
+package io.github.goodgoodjm.otter.core.dsl.createtable
 
-import com.goodgoodman.otter.core.dsl.Constraint
-import com.goodgoodman.otter.core.dsl.SchemaContext
-import com.goodgoodman.otter.core.dsl.SchemaMaker
+import io.github.goodgoodjm.otter.core.dsl.Constraint
+import io.github.goodgoodjm.otter.core.dsl.SchemaContext
+import io.github.goodgoodjm.otter.core.dsl.SchemaMaker
 import org.jetbrains.exposed.sql.ColumnType
 import org.jetbrains.exposed.sql.Table
 import java.util.*
