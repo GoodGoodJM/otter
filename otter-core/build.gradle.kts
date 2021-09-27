@@ -65,16 +65,25 @@ tasks {
 
                     pom.project {
                         withGroovyBuilder {
-                            "parent" {
-                                "groupId"("io.github.goodgoodjm")
-                                "artifactId"("otter-core")
-                                "version"("0.0.1")
+                            "name"("otter-core")
+                            "description"("Otter, DB Migration tools for kotlin")
+                            "url"("https://github.com/goodgoodjm/otter")
+                            "scm" {
+                                "connection"("scm:git:git://github.com/goodgoodjm/otter.git")
+                                "developerConnection"("scm:git:ssh://git@github.com:goodgoodjm/otter.git")
+                                "url"("https://github.com/goodgoodjm/otter")
                             }
                             "licenses" {
                                 "license" {
                                     "name"("The Apache Software License, Version 2.0")
                                     "url"("http://www.apache.org/licenses/LICENSE-2.0.txt")
                                     "distribution"("repo")
+                                }
+                            }
+                            "developers" {
+                                "developer" {
+                                    "id"("goodgoodman")
+                                    "name"("goodgoodman")
                                 }
                             }
                         }
