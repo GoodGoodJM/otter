@@ -1,1 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=io.github.goodgoodjm.otter.OtterAutoConfiguration
+org.springframework.boot.sql.init.dependency.DatabaseInitializerDetector=io.github.goodgoodjm.otter.OtterDatabaseInitializerDetector
