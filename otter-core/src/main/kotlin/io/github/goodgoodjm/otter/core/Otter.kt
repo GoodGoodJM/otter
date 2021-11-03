@@ -1,14 +1,13 @@
 package io.github.goodgoodjm.otter.core
 
+import io.github.goodgoodjm.otter.core.resourceresolver.ResourceResolver
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.`java-time`.CurrentDateTime
 import org.jetbrains.exposed.sql.`java-time`.datetime
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.io.File
 import java.io.Reader
-import java.nio.file.Paths
 import javax.script.ScriptEngineManager
 
 class Otter(
@@ -101,22 +100,17 @@ class MigrationProcess(
         }
     }
 
-    private fun loadMigrations(): Map<String, Migration> {
-        return loadMigrationFiles()
-            .sortedBy { it.name }
-            .associate {
-                it.name to evalMigration(it.reader())
-            }
-    }
+    private fun loadMigrations(): Map<String, Migration> = ResourceResolver().resolveEntries(migrationPath)
+        .sortedBy { it }
+        .also { logger.debug("Target files : $it") }
+        .associateWith { this::class.java.classLoader.getResource(it) }
+        .filterValues { it != null }
+        .mapKeys { it.key.split("/").last() }
+        .mapValues { evalMigration(it.value!!.openStream().reader()) }
 
     private fun evalMigration(reader: Reader): Migration {
         val engine = ScriptEngineManager().getEngineByExtension("kts")
         return engine.eval(reader) as Migration
     }
-
-    private fun loadMigrationFiles(): Array<File> {
-        val directoryURL = this::class.java.classLoader.getResource(migrationPath)!!.toURI()
-        val directory = Paths.get(directoryURL).toFile()
-        return directory.listFiles()!!
-    }
 }
+
