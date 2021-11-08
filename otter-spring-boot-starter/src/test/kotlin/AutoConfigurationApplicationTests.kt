@@ -20,7 +20,6 @@ class AutoConfigurationApplicationTests {
     fun otterConfigProperties() {
         contextRunner.withPropertyValues("otter.driverClassName=asd").run { context ->
             assertThat(context).getBean(OtterAutoConfiguration::class.java)
-                .extracting { it.getConfig().driverClassName }
                 .isEqualTo("asd")
         }
     }
@@ -36,8 +35,6 @@ class AutoConfigurationApplicationTests {
             "otter.showSql=true",
         ).run { context ->
             assertThat(context).getBean(OtterAutoConfiguration::class.java)
-                .extracting { it.getConfig().driverClassName }
-                .isEqualTo("org.h2.Driver")
         }
     }
 }

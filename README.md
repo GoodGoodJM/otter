@@ -11,6 +11,7 @@ DB Migration Tool for Kotlin. Inspired by [harmonica](https://github.com/KenjiOh
 - [X] ForeignKey
 - [X] Add Column, Drop Column
 - [X] Raw query
+- [ ] Sequence
 - [X] Modify Constraints
 - [X] Support H2
 - [X] Configuration by proIperties
