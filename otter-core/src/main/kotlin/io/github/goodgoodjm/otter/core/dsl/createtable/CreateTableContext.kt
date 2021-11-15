@@ -51,7 +51,7 @@ class CreateTableContext(tableSchema: TableSchema) : SchemaContext {
                 }
             }
         }
-        return table.ddl
+        return with(table) { ddl + indices.flatMap { it.createStatement() } }
     }
 
     private fun registerColumn(columnContext: ColumnContext) {
