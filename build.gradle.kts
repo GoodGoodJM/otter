@@ -10,7 +10,7 @@ repositories {
 
 allprojects {
     group = "io.github.goodgoodjm"
-    version = "0.0.13"
+    version = "0.0.14"
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
