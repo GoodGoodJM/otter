@@ -14,6 +14,10 @@ object : Migration() {
             column("name") {
                 type = "VARCHAR(255)"
             }
+
+            column("age") {
+                type = "INT"
+            } constraints (Constraint.UNIQUE)
         }
     }
 
