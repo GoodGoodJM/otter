@@ -1,29 +1,24 @@
-import com.goodgoodman.otter.core.Migration
-import com.goodgoodman.otter.core.schema.Constraint
+import io.github.goodgoodjm.otter.core.Migration
+import io.github.goodgoodjm.otter.core.dsl.Constraint
 
 object : Migration() {
+    override val comment = "Create user"
+
     override fun up() {
-        createTable {
-            name = "user"
-            column {
-                name = "id"
+        createTable("user") {
+
+            column("id") {
                 type = "INT"
-                setConstraint(Constraint.PRIMARY)
-            }
-            column {
-                name = "person_id"
-                type = " INT"
-                reference {
-                    toTable = "person"
-                    toColumn = "id"
-                    key = "fk_user_person"
-                }
-            }
+            } constraints Constraint.PRIMARY
+
+            column("person_id") {
+                type = "INT"
+            } constraints Constraint.NOT_NULL foreignKey { reference = "person(id)" }
         }
     }
 
     override fun down() {
-        TODO("Not yet implemented")
+        dropTable("user")
     }
-
 }
+
