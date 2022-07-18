@@ -33,7 +33,7 @@ class CreateTableContext(tableSchema: TableSchema) : SchemaContext {
                 columnContext.constraints.forEach { constraint ->
                     column = when (constraint) {
                         Constraint.PRIMARY -> column.apply {
-                            this.indexInPK = columns.count { it.indexInPK != null } + 1
+                            // this.indexInPK = columns.count { it.indexInPK != null } + 1
                         }
                         Constraint.NOT_NULL -> column.apply { columnType.nullable = false }
                         Constraint.AUTO_INCREMENT -> column.autoIncrement()
