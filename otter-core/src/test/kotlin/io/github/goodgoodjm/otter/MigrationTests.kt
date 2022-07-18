@@ -51,3 +51,4 @@ class MigrationTests {
         assertEquals(2, migration.contexts.size)
     }
 }
+

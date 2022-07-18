@@ -4,6 +4,7 @@ plugins {
     java apply true
     id("org.springframework.boot") version "2.5.5"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("com.github.johnrengelman.shadow") version "5.2.0"
     kotlin("jvm")
     kotlin("kapt")
 }
