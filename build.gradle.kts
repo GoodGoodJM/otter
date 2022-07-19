@@ -15,6 +15,7 @@ nexusPublishing {
             username.set(System.getenv("otter.sonatype.user"))
             password.set(System.getenv("otter.sonatype.password"))
             useStaging.set(true)
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
         }
     }
 }

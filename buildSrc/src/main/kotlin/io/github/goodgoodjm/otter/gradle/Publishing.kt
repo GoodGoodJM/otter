@@ -44,10 +44,10 @@ fun MavenPom.configureMavenCentralMetadata(project: Project) {
 fun MavenPublication.signPublicationIfKeyPresent(project: Project) {
     val keyId = System.getenv("otter.sign.key.id")
     val signingKey = System.getenv("otter.sign.key.private")
-    val signingKeyPassphrase = System.getenv("otter.sign.passphrase")
+    val signingKeyPassword = System.getenv("otter.sign.key.password")
     if (!signingKey.isNullOrBlank()) {
         project.extensions.configure<SigningExtension>("signing") {
-            useInMemoryPgpKeys(keyId, signingKey.replace(" ", "\r\n"), signingKeyPassphrase)
+            useInMemoryPgpKeys(keyId, signingKey.replace(" ", "\r\n"), signingKeyPassword)
             sign(this@signPublicationIfKeyPresent)
         }
     }
