@@ -5,11 +5,11 @@ object : Migration() {
     override val comment = "Raw query test"
 
     override fun up() {
-        rawQuery("INSERT INTO person (name) VALUES ('ggm0')")
-        rawQuery("INSERT INTO person (name) VALUES ('ggm1')")
-        rawQuery("INSERT INTO person (name) VALUES ('ggm2')")
-        rawQuery("INSERT INTO person (name) VALUES ('ggm3')")
-        rawQuery("INSERT INTO person (name) VALUES ('ggm4')")
+        rawQuery("INSERT INTO person (name, age) VALUES ('ggm0', 20)")
+        rawQuery("INSERT INTO person (name, age) VALUES ('ggm1', 20)")
+        rawQuery("INSERT INTO person (name, age) VALUES ('ggm2', 20)")
+        rawQuery("INSERT INTO person (name, age) VALUES ('ggm3', 20)")
+        rawQuery("INSERT INTO person (name, age) VALUES ('ggm4', 20)")
     }
 
     override fun down() {

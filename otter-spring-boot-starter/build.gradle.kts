@@ -23,10 +23,15 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
 
+    testImplementation(kotlin("test"))
     testImplementation(kotlin("script-runtime"))
 
-    testImplementation("com.h2database:h2:1.4.200")
+    testImplementation("com.h2database:h2")
     testImplementation("ch.qos.logback:logback-classic:1.2.6")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> { enabled = false }
