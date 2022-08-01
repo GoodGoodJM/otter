@@ -32,22 +32,28 @@ class DynamicPrimaryKeyTable(name: String) : Table(name) {
 
 
     private fun addColumn(name: String, columnSchema: ColumnSchema) {
-        val column = registerColumn<Comparable<Any>>(name, columnSchema.columnType)
+        var column = registerColumn<Comparable<Any>>(name, columnSchema.columnType)
         columnSchema.constraints.forEach { constraint ->
             when (constraint) {
-                Constraint.PRIMARY -> primaryKeys += column
+                Constraint.PRIMARY, Constraint.NOT_NULL -> null
                 Constraint.NULLABLE -> column.columnType.nullable = true
-                Constraint.AUTO_INCREMENT -> column.autoIncrement()
-                Constraint.UNIQUE -> column.uniqueIndex()
+                Constraint.AUTO_INCREMENT -> column = column.autoIncrement()
+                Constraint.UNIQUE -> column = column.uniqueIndex()
                 else -> throw Exception("Constraint($constraint) is not supported")
             }
         }
+
+
 
         columnSchema.foreignKey?.let { expression ->
             val result = REGEX.find(expression) ?: throw Exception("Wrong foreignKey expression.")
             val (tableName, columnName) = result.destructured
             val target = Table(tableName).registerColumn<Comparable<Any>>(columnName, column.columnType)
             column.references(target)
+        }
+
+        if (columnSchema.constraints.any { it == Constraint.PRIMARY }) {
+            primaryKeys += column
         }
     }
 
