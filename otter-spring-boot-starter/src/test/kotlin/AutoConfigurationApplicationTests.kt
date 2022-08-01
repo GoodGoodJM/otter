@@ -10,21 +10,6 @@ class AutoConfigurationApplicationTests {
         .withConfiguration(AutoConfigurations.of(OtterAutoConfiguration::class.java))
 
     @Test
-    fun otterConfigExists() {
-        contextRunner.run {
-            assertThat(it).hasSingleBean(OtterAutoConfiguration::class.java)
-        }
-    }
-
-    @Test
-    fun otterConfigProperties() {
-        contextRunner.withPropertyValues("otter.driverClassName=asd").run { context ->
-            assertThat(context).getBean(OtterAutoConfiguration::class.java)
-                .isEqualTo("asd")
-        }
-    }
-
-    @Test
     fun TEMP() {
         contextRunner.withPropertyValues(
             "otter.driverClassName=org.h2.Driver",

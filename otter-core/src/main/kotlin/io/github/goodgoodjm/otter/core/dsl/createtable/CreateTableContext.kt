@@ -1,100 +1,55 @@
 package io.github.goodgoodjm.otter.core.dsl.createtable
 
+import io.github.goodgoodjm.otter.core.Logger
 import io.github.goodgoodjm.otter.core.dsl.Constraint
 import io.github.goodgoodjm.otter.core.dsl.SchemaContext
-import io.github.goodgoodjm.otter.core.dsl.SchemaMaker
-import org.jetbrains.exposed.sql.ColumnType
+import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
-import java.util.*
 
-class CreateTableContext(tableSchema: TableSchema) : SchemaContext {
-    companion object {
+class CreateTableContext constructor(val tableSchema: TableSchema) : SchemaContext {
+    override fun resolve(): List<String> {
+        return DynamicPrimaryKeyTable.with(tableSchema).resolve()
+    }
+}
+
+class DynamicPrimaryKeyTable(name: String) : Table(name) {
+    companion object : Logger {
         val REGEX = """([\w]+)\(([\w]+)\)""".toRegex()
+
+        fun with(tableSchema: TableSchema): DynamicPrimaryKeyTable = DynamicPrimaryKeyTable(tableSchema.name).apply {
+            tableSchema.columnSchemaMap.map { (key, value) -> addColumn(key, value) }
+        }
     }
 
-    val name = tableSchema.name
+    private var primaryKeys: Array<Column<*>> = arrayOf()
 
-    val columnContexts: List<ColumnContext> get() = _columnContexts
-    private val _columnContexts = mutableListOf<ColumnContext>()
+    override val primaryKey: PrimaryKey?
+        get() = if (primaryKeys.isEmpty()) {
+            null
+        } else {
+            PrimaryKey(primaryKeys)
+        }
 
 
-    override fun resolve(): List<String> {
-        val table = Table(name)
-        with(table) {
-            columnContexts.forEach { columnContext ->
-                val columnType = when (val type: Any = columnContext.type) {
-                    is String -> object : ColumnType() {
-                        override var nullable: Boolean = true
-                        override fun sqlType(): String = type
-                    }
-                    else -> throw Exception("ColumnType($type) is not supported")
-                }
-                var column = table.registerColumn<Comparable<Any>>(columnContext.name, columnType)
-                columnContext.constraints.forEach { constraint ->
-                    column = when (constraint) {
-                        Constraint.PRIMARY -> column.apply { indexInPK = columns.count { it.indexInPK != null } + 1 }
-                        Constraint.NOT_NULL -> column.apply { columnType.nullable = false }
-                        Constraint.AUTO_INCREMENT -> column.autoIncrement()
-                        Constraint.UNIQUE -> column.uniqueIndex()
-                        else -> throw Exception("Constraint($constraint) is not supported")
-                    }
-                }
-
-                if (columnContext.foreignKeyContext != null) {
-                    val foreignKeyContext = columnContext.foreignKeyContext!!
-                    val (targetTableName, targetColumnName) = REGEX.find(foreignKeyContext.reference)!!.destructured
-                    val targetColumn = Table(targetTableName)
-                        .registerColumn<Comparable<Any>>(targetColumnName, column.columnType)
-                    column.references(targetColumn, fkName = foreignKeyContext.key.ifEmpty { null })
-                }
+    private fun addColumn(name: String, columnSchema: ColumnSchema) {
+        val column = registerColumn<Comparable<Any>>(name, columnSchema.columnType)
+        columnSchema.constraints.forEach { constraint ->
+            when (constraint) {
+                Constraint.PRIMARY -> primaryKeys += column
+                Constraint.NULLABLE -> column.columnType.nullable = true
+                Constraint.AUTO_INCREMENT -> column.autoIncrement()
+                Constraint.UNIQUE -> column.uniqueIndex()
+                else -> throw Exception("Constraint($constraint) is not supported")
             }
         }
-        return table.ddl
-    }
 
-    private fun registerColumn(columnContext: ColumnContext) {
-        _columnContexts.add(columnContext)
-    }
-
-    @SchemaMaker
-    fun column(name: String, block: ColumnSchema.() -> Unit): ColumnContext {
-        val columnSchema = ColumnSchema(name).apply(block)
-        return ColumnContext(columnSchema).also {
-            registerColumn(it)
+        columnSchema.foreignKey?.let { expression ->
+            val result = REGEX.find(expression) ?: throw Exception("Wrong foreignKey expression.")
+            val (tableName, columnName) = result.destructured
+            val target = Table(tableName).registerColumn<Comparable<Any>>(columnName, column.columnType)
+            column.references(target)
         }
     }
 
-    class ForeignKeyContext(foreignKeySchema: ForeignKeySchema) {
-        val key: String = foreignKeySchema.key
-        val reference: String = foreignKeySchema.reference
-    }
-
-    class ColumnContext(columnSchema: ColumnSchema) {
-        val name = columnSchema.name
-        val type = columnSchema.type
-
-        var foreignKeyContext: ForeignKeyContext? = null
-
-        val constraints: EnumSet<Constraint> get() = _constraints
-        private val _constraints = EnumSet.noneOf(Constraint::class.java)
-
-        @SchemaMaker
-        infix fun constraints(constraints: List<Constraint>): ColumnContext {
-            constraints.forEach(this::constraints)
-            return this
-        }
-
-        @SchemaMaker
-        infix fun constraints(constraint: Constraint): ColumnContext {
-            _constraints.add(constraint)
-            return this
-        }
-
-        @SchemaMaker
-        infix fun foreignKey(block: ForeignKeySchema.() -> Unit): ColumnContext {
-            val foreignKeySchema = ForeignKeySchema().apply(block)
-            this.foreignKeyContext = ForeignKeyContext(foreignKeySchema)
-            return this
-        }
-    }
+    fun resolve(): List<String> = ddl + indices.flatMap { it.createStatement() }
 }

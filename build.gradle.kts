@@ -1,32 +1,26 @@
 plugins {
-    base
-    kotlin("jvm") version "1.5.21"
-    maven
-}
-
-repositories {
-    mavenCentral()
+    kotlin("jvm") apply true
+    id("io.github.gradle-nexus.publish-plugin") apply true
 }
 
 allprojects {
-    group = "io.github.goodgoodjm"
-    version = "0.0.13"
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "11"
-        }
-    }
-
-    tasks.withType<Test> {
-        useJUnitPlatform()
+    if(this != rootProject) {
+        apply(from = rootProject.file("buildScripts/gradle/publishing.gradle.kts"))
     }
 }
 
-subprojects {
+nexusPublishing {
     repositories {
-        mavenCentral()
-        jcenter()
+        sonatype {
+            username.set(System.getenv("otter.sonatype.user"))
+            password.set(System.getenv("otter.sonatype.password"))
+            useStaging.set(true)
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+        }
     }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
 }

@@ -1,34 +1,71 @@
 package io.github.goodgoodjm.otter
 
-import io.github.goodgoodjm.otter.core.dsl.Constraint
-import io.github.goodgoodjm.otter.core.dsl.createtable.CreateTableContext
-import io.github.goodgoodjm.otter.core.dsl.createtable.TableSchema
+import io.github.goodgoodjm.otter.core.dsl.Constraint.*
+import io.github.goodgoodjm.otter.core.dsl.createtable.*
+import io.github.goodgoodjm.otter.core.dsl.type.Type.bool
+import io.github.goodgoodjm.otter.core.dsl.type.Type.int
+import io.github.goodgoodjm.otter.core.dsl.type.Type.long
+import io.github.goodgoodjm.otter.core.dsl.type.Type.varchar
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.Test
-import kotlin.test.assertNotEquals
+import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.transactions.transactionManager
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import kotlin.test.assertContains
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class CreateTableContextTests {
-    @Test
-    fun `Resolve CreateTableContext`() {
-        Database.connect("jdbc:h2:mem:test", driver = "org.h2.Driver", user = "root", password = "")
-        transaction {
-            val tableContext = CreateTableContext(TableSchema("person")).apply {
-                column("id") {
-                    type = "int"
-                } constraints (Constraint.PRIMARY)
-                column("name") {
-                    type = "varchar(255)"
-                } constraints (Constraint.NOT_NULL)
-                column("address") {
-                    type = "varchar(255)"
-                }
-                column("master_id") {
-                    type = "int"
-                } foreignKey { reference = "person(id)" }
-            }
-            val table = tableContext.resolve()
-            assertNotEquals(0, table.size)
+    private lateinit var transaction: Transaction
+
+    companion object {
+        private lateinit var db: Database
+
+        @BeforeAll
+        @JvmStatic
+        fun setup() {
+            db = Database.connect("jdbc:h2:mem:test", driver = "org.h2.Driver", user = "root", password = "")
         }
+    }
+
+    @BeforeEach
+    fun init() {
+        transaction = db.transactionManager.newTransaction()
+    }
+
+    @AfterEach
+    fun tearDown() {
+        transaction.commit()
+    }
+
+    @Test
+    fun `V2 test`() {
+        val tableName = "person"
+
+        val table = CreateTableContext(TableSchema(tableName).also {
+            it["id"] = int() constraints PRIMARY and AUTO_INCREMENT
+            it["name"] = varchar()
+            it["address_id"] = int() foreignKey "address(id)"
+            it["lat"] = long() constraints UNIQUE
+            it["nullable"] = bool() constraints NULLABLE
+        })
+
+        table.tableSchema.also {
+            assertEquals(tableName, it.name)
+            assertEquals(5, it.columnSchemaMap.size)
+        }
+
+        table.tableSchema.columnSchemaMap.also {
+            val idKey = "id"
+            val idColumn = it[idKey]
+            assertNotNull(idColumn)
+            assertEquals(2, idColumn.constraints.size)
+            assertContains(idColumn.constraints, PRIMARY)
+            assertContains(idColumn.constraints, AUTO_INCREMENT)
+        }
+
+        val temp = table.resolve()
     }
 }

@@ -1,9 +1,15 @@
 package io.github.goodgoodjm.otter
 
 import io.github.goodgoodjm.otter.core.Migration
-import io.github.goodgoodjm.otter.core.dsl.Constraint
-import io.github.goodgoodjm.otter.core.dsl.and
-import org.junit.Test
+import io.github.goodgoodjm.otter.core.dsl.Constraint.*
+import io.github.goodgoodjm.otter.core.dsl.createtable.and
+import io.github.goodgoodjm.otter.core.dsl.createtable.constraints
+import io.github.goodgoodjm.otter.core.dsl.createtable.foreignKey
+import io.github.goodgoodjm.otter.core.dsl.type.Type.bool
+import io.github.goodgoodjm.otter.core.dsl.type.Type.int
+import io.github.goodgoodjm.otter.core.dsl.type.Type.long
+import io.github.goodgoodjm.otter.core.dsl.type.Type.varchar
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class MigrationTests {
@@ -12,17 +18,17 @@ class MigrationTests {
         val migration = object : Migration() {
             override fun up() {
                 createTable("person") {
-                    column("id") {
-                        type = "INT UNSIGNED"
-                    } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
+                    it["id"] = int() constraints PRIMARY and AUTO_INCREMENT
+                    it["name"] = varchar(30)
+                    it["message"] = varchar()
+                    it["address_id"] = int() foreignKey "address(id)"
+                    it["lat"] = long() constraints UNIQUE
+                    it["nullable"] = bool() constraints NULLABLE
                 }
+
                 createTable("post") {
-                    column("id") {
-                        type = "INT UNSIGNED"
-                    } constraints (Constraint.PRIMARY and Constraint.AUTO_INCREMENT)
-                    column("person_id") {
-                        type = "INT UNSIGNED"
-                    } foreignKey { reference = "person(id)" }
+                    it["id"] = int() constraints PRIMARY and AUTO_INCREMENT
+                    it["person_id"] = int() foreignKey "person(id)"
                 }
             }
 
@@ -51,3 +57,4 @@ class MigrationTests {
         assertEquals(2, migration.contexts.size)
     }
 }
+
