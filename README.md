@@ -31,7 +31,7 @@ Add otter dependencies and task within your application.
 /** ... */
 dependencies {
     /** ... */
-    implementation("io.github.goodgoodjm:otter-spring-boot-starter:0.0.14")
+    implementation("io.github.goodgoodjm:otter-spring-boot-starter:0.0.16")
     implementation(kotlin("script-runtime")) // for migration files of resources
     /** ... */
 }
@@ -71,7 +71,6 @@ object : Migration() {
             it["id"] = int() constraints PRIMARY and AUTO_INCREMENT
             it["name"] = varchar(30)
             it["message"] = varchar()
-            it["address_id"] = int() foreignKey "address(id)"
             it["lat"] = long() constraints UNIQUE
             it["nullable"] = bool() constraints NULLABLE
         }
