@@ -2,6 +2,7 @@ package io.github.goodgoodjm.otter.core.dsl.type
 
 import io.github.goodgoodjm.otter.core.dsl.createtable.ColumnSchema
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.javatime.*
 
 class CustomColumnType(val type: String) : ColumnType() {
     override fun sqlType(): String = type
@@ -57,5 +58,14 @@ object Type {
 
     fun bool(): ColumnSchema = ColumnSchema(BooleanColumnType())
 
+    fun date(): ColumnSchema = ColumnSchema(JavaLocalDateColumnType())
+
+    fun datetime(): ColumnSchema = ColumnSchema(JavaLocalDateTimeColumnType())
+
+    fun time(): ColumnSchema = ColumnSchema(JavaLocalTimeColumnType())
+
+    fun timestamp(): ColumnSchema = ColumnSchema(JavaInstantColumnType())
+
+    fun duration(): ColumnSchema = ColumnSchema(JavaDurationColumnType())
 }
 
