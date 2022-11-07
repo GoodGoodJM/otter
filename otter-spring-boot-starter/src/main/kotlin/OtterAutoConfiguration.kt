@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(value = ["otter.enable"], matchIfMissing = true)
+@ConditionalOnProperty(value = ["otter.enable"])
 @AutoConfigureAfter(DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class)
 @Import(DatabaseInitializationDependencyConfigurer::class)
 open class OtterAutoConfiguration(
