@@ -21,7 +21,7 @@ pluginBundle {
     website = "https://github.com/GoodGoodJM/Otter"
     vcsUrl = "https://github.com/GoodGoodJM/Otter.git"
     tags = listOf("kotlin")
-    description = "This plugin adds some tasks and makes you coffee"
+    description = "Otter Plugin is a Gradle Plugin for Otter DBMigration tool."
 }
 
 repositories {
