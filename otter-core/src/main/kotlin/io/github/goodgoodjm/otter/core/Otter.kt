@@ -1,13 +1,18 @@
 package io.github.goodgoodjm.otter.core
 
 import io.github.goodgoodjm.otter.core.resourceresolver.ResourceResolver
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.Reader
+import java.net.InetAddress
+import java.time.LocalDateTime
 import javax.script.ScriptEngineManager
 
 class Otter(
@@ -47,23 +52,102 @@ object MigrationTable : IntIdTable("otter_migration") {
     fun last() = selectAll().orderBy(createdAt to SortOrder.DESC).firstOrNull()
 }
 
+object LockTable : IntIdTable("otter_lock") {
+    val isLocked = bool("is_locked")
+    val grantedAt = datetime("granted_at")
+    val lockedBy = varchar("locked_by", 255)
+}
+
 class MigrationProcess(
     private val transaction: Transaction,
     private val migrationPath: String,
     private val showSql: Boolean,
 ) {
+    private var hasLock: Boolean = false
+
     companion object : Logger
 
     fun exec() {
         createMigrationTable()
+        waitForLock()
         migration()
+        releaseLock()
     }
 
     private fun createMigrationTable() {
-        if (MigrationTable.exists()) {
-            return
+        with(LockTable) {
+            if (!exists()) {
+                SchemaUtils.create(this)
+                if (selectAll().count() == 0L) {
+                    try {
+                        transaction {
+                            insert {
+                                it[id] = 1
+                                it[isLocked] = false
+                                it[lockedBy] = ""
+                                it[grantedAt] = LocalDateTime.MIN
+                            }
+                            this.commit()
+                        }
+                    } catch (e: ExposedSQLException) {
+                        logger.error("Lock table initialize error - ", e)
+                    }
+                }
+            }
         }
-        SchemaUtils.create(MigrationTable)
+
+        if (!MigrationTable.exists()) {
+            SchemaUtils.create(MigrationTable)
+        }
+    }
+
+    private fun waitForLock() {
+        var hasLock = false
+        runBlocking {
+            val loopLimit = 60
+            var count = 0
+            while (!hasLock && count < loopLimit) {
+                count++
+                hasLock = acquireLock()
+                if (!hasLock) {
+                    logger.info("Waiting for lock...(${count})")
+                    delay(1_000)
+                }
+            }
+        }
+        if (!hasLock) {
+            val lockedBy = with(LockTable) { select { isLocked eq true }.first()[lockedBy] }
+            throw LockException("Could not get a database lock. Currently locked by $lockedBy")
+        }
+    }
+
+    private fun releaseLock() {
+        with(LockTable) {
+            update({ id eq 1 }) {
+                it[isLocked] = false
+                it[lockedBy] = ""
+                it[grantedAt] = LocalDateTime.MIN
+            }
+        }
+    }
+
+    private fun acquireLock(): Boolean {
+        if (hasLock) {
+            return true
+        }
+
+        val isLocked = LockTable.select { LockTable.id eq 1 }.first()[LockTable.isLocked]
+
+        if (isLocked) return false
+        val affectedCount = with(LockTable) {
+            update({ (id eq 1) and (this@with.isLocked eq false) }) {
+                it[this.isLocked] = true
+                it[grantedAt] = CurrentDateTime
+                it[lockedBy] = InetAddress.getLocalHost().run { "$hostName ($hostAddress)" }
+            }
+        }
+        hasLock = affectedCount != 0
+        return hasLock
     }
 
     private fun migration() {
