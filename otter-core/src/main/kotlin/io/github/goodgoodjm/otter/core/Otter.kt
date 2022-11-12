@@ -12,7 +12,6 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.Reader
 import java.net.InetAddress
-import java.time.LocalDateTime
 import javax.script.ScriptEngineManager
 
 class Otter(
@@ -47,14 +46,14 @@ class Otter(
 object MigrationTable : IntIdTable("otter_migration") {
     val filename = varchar("filename", 255).uniqueIndex()
     val comment = varchar("comment", 255)
-    private val createdAt = datetime("created_at").defaultExpression(CurrentDateTime())
+    private val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)
 
     fun last() = selectAll().orderBy(createdAt to SortOrder.DESC).firstOrNull()
 }
 
 object LockTable : IntIdTable("otter_lock") {
     val isLocked = bool("is_locked")
-    val grantedAt = datetime("granted_at")
+    val grantedAt = datetime("granted_at").nullable()
     val lockedBy = varchar("locked_by", 255)
 }
 
@@ -69,8 +68,14 @@ class MigrationProcess(
 
     fun exec() {
         createMigrationTable()
+        lock {
+            migration()
+        }
+    }
+
+    private fun lock(block: () -> Unit) {
         waitForLock()
-        migration()
+        block()
         releaseLock()
     }
 
@@ -78,16 +83,15 @@ class MigrationProcess(
         with(LockTable) {
             if (!exists()) {
                 SchemaUtils.create(this)
-                if (selectAll().count() == 0L) {
+                if (selectAll().count().toInt() == 0) {
                     try {
                         transaction {
                             insert {
                                 it[id] = 1
                                 it[isLocked] = false
                                 it[lockedBy] = ""
-                                it[grantedAt] = LocalDateTime.MIN
+                                it[grantedAt] = null
                             }
-                            this.commit()
                         }
                     } catch (e: ExposedSQLException) {
                         logger.error("Lock table initialize error - ", e)
@@ -122,20 +126,18 @@ class MigrationProcess(
     }
 
     private fun releaseLock() {
+        if (!hasLock) throw LockException("Unlocked process try to release lock")
+
         with(LockTable) {
             update({ id eq 1 }) {
                 it[isLocked] = false
                 it[lockedBy] = ""
-                it[grantedAt] = LocalDateTime.MIN
+                it[grantedAt] = null
             }
         }
     }
 
     private fun acquireLock(): Boolean {
-        if (hasLock) {
-            return true
-        }
-
         val isLocked = LockTable.select { LockTable.id eq 1 }.first()[LockTable.isLocked]
 
         if (isLocked) return false
