@@ -5,10 +5,10 @@ import io.github.goodgoodjm.otter.core.dsl.Constraint.*
 import io.github.goodgoodjm.otter.core.dsl.createtable.and
 import io.github.goodgoodjm.otter.core.dsl.createtable.constraints
 import io.github.goodgoodjm.otter.core.dsl.createtable.foreignKey
-import io.github.goodgoodjm.otter.core.dsl.type.Type.bool
-import io.github.goodgoodjm.otter.core.dsl.type.Type.int
-import io.github.goodgoodjm.otter.core.dsl.type.Type.long
-import io.github.goodgoodjm.otter.core.dsl.type.Type.varchar
+import io.github.goodgoodjm.otter.core.dsl.type.Type.BOOL
+import io.github.goodgoodjm.otter.core.dsl.type.Type.INT
+import io.github.goodgoodjm.otter.core.dsl.type.Type.LONG
+import io.github.goodgoodjm.otter.core.dsl.type.Type.VARCHAR
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -18,17 +18,17 @@ class MigrationTests {
         val migration = object : Migration() {
             override fun up() {
                 createTable("person") {
-                    "id" - int() constraints PRIMARY and AUTO_INCREMENT
-                    "name" - varchar(30)
-                    "message" - varchar()
-                    "address_id" - int() foreignKey "address(id)"
-                    "lat" - long() constraints UNIQUE
-                    "nullable" - bool() constraints NULLABLE
+                    "id" - INT constraints PRIMARY and AUTO_INCREMENT
+                    "name" - VARCHAR(30)
+                    "message" - VARCHAR
+                    "address_id" - INT foreignKey "address(id)"
+                    "lat" - LONG constraints UNIQUE
+                    "nullable" - BOOL constraints NULLABLE
                 }
 
                 createTable("post") {
-                    "id" - int() constraints PRIMARY and AUTO_INCREMENT
-                    "person_id" - int() foreignKey "person(id)"
+                    "id" - INT constraints PRIMARY and AUTO_INCREMENT
+                    "person_id" - INT foreignKey "person(id)"
                 }
             }
 

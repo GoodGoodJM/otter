@@ -2,10 +2,10 @@ package io.github.goodgoodjm.otter
 
 import io.github.goodgoodjm.otter.core.dsl.Constraint.*
 import io.github.goodgoodjm.otter.core.dsl.createtable.*
-import io.github.goodgoodjm.otter.core.dsl.type.Type.bool
-import io.github.goodgoodjm.otter.core.dsl.type.Type.int
-import io.github.goodgoodjm.otter.core.dsl.type.Type.long
-import io.github.goodgoodjm.otter.core.dsl.type.Type.varchar
+import io.github.goodgoodjm.otter.core.dsl.type.Type.BOOL
+import io.github.goodgoodjm.otter.core.dsl.type.Type.INT
+import io.github.goodgoodjm.otter.core.dsl.type.Type.LONG
+import io.github.goodgoodjm.otter.core.dsl.type.Type.VARCHAR
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transactionManager
@@ -45,11 +45,11 @@ class CreateTableContextTests {
         val tableName = "person"
 
         val table = CreateTableContext(TableSchema(tableName).apply {
-            "id" - int() constraints PRIMARY and AUTO_INCREMENT
-            "name" - varchar()
-            "address_id" - int() foreignKey "address(id)"
-            "lat" - long() constraints UNIQUE
-            "nullable" - bool() constraints NULLABLE
+            "id" - INT constraints PRIMARY and AUTO_INCREMENT
+            "name" - VARCHAR
+            "address_id" - INT foreignKey "address(id)"
+            "lat" - LONG constraints UNIQUE
+            "nullable" - BOOL constraints NULLABLE
         })
 
         table.tableSchema.also {

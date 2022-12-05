@@ -30,7 +30,7 @@ Add otter dependencies and task within your application.
 /** ... */
 dependencies {
     /** ... */
-    implementation("io.github.goodgoodjm:otter-spring-boot-starter:0.0.22")
+    implementation("io.github.goodgoodjm:otter-spring-boot-starter:0.0.23")
     implementation(kotlin("script-runtime")) // for migration files of resources
     /** ... */
 }
@@ -67,16 +67,16 @@ import io.github.goodgoodjm.otter.core.dsl.and
 object : Migration() {
     override fun up() {
         createTable("person") {
-            "id" - int() constraints PRIMARY and AUTO_INCREMENT
-            "name" - varchar(30)
-            "message" - varchar()
-            "lat" - long() constraints UNIQUE
-            "nullable" - bool() constraints NULLABLE
+            "id" - INT constraints PRIMARY and AUTO_INCREMENT
+            "name" - VARCHAR(30)
+            "message" - VARCHAR
+            "lat" - LONG() constraints UNIQUE
+            "nullable" - BOOL() constraints NULLABLE
         }
 
         createTable("post") {
-            "id" - int() constraints PRIMARY and AUTO_INCREMENT
-            "person_id" - int() foreignKey "person(id)"
+            "id" - INT constraints PRIMARY and AUTO_INCREMENT
+            "person_id" - INT foreignKey "person(id)"
         }
     }
 
