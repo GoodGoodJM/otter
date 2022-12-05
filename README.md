@@ -70,8 +70,8 @@ object : Migration() {
             "id" - INT constraints PRIMARY and AUTO_INCREMENT
             "name" - VARCHAR(30)
             "message" - VARCHAR
-            "lat" - LONG() constraints UNIQUE
-            "nullable" - BOOL() constraints NULLABLE
+            "lat" - LONG constraints UNIQUE
+            "nullable" - BOOL constraints NULLABLE
         }
 
         createTable("post") {
