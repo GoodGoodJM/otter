@@ -75,8 +75,8 @@ class MigrationProcess(
 
     private fun lock(block: () -> Unit) {
         waitForLock()
-        block()
-        releaseLock()
+        runCatching(block)
+            .also { releaseLock() }
     }
 
     private fun createMigrationTable() {

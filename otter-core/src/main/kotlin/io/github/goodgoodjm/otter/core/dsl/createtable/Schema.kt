@@ -13,6 +13,10 @@ class TableSchema(val name: String) {
         _columnSchemaMap[key] = value
     }
 
+    infix operator fun String.minus(value: ColumnSchema): ColumnSchema {
+        set(this, value)
+        return value
+    }
 }
 
 data class ColumnSchema internal constructor(
