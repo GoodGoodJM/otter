@@ -8,29 +8,37 @@ import org.jetbrains.exposed.sql.ColumnType
 class TableSchema(val name: String) {
     val columnSchemaMap: Map<String, ColumnSchema> get() = _columnSchemaMap
     private val _columnSchemaMap = mutableMapOf<String, ColumnSchema>()
+
+    @Deprecated("Use minus operator")
     operator fun set(key: String, value: ColumnSchema) {
         require(key.isNotEmpty())
+        pair(key, value)
+    }
+
+    private fun pair(key: String, value: ColumnSchema) {
         _columnSchemaMap[key] = value
     }
 
-    infix operator fun String.minus(value: ColumnSchema): ColumnSchema {
-        set(this, value)
+    operator fun String.minus(value: ColumnSchema): ColumnSchema {
+        pair(this, value)
         return value
     }
 }
 
 data class ColumnSchema internal constructor(
     val columnType: ColumnType,
-    val constraints: List<Constraint> = listOf(),
-    val foreignKey: String? = null,
+    var constraints: List<Constraint> = listOf(),
+    var foreignKey: String? = null,
 ) {
     constructor (type: String, constraints: List<Constraint> = listOf()) : this(CustomColumnType(type), constraints)
 }
 
 
 @SchemaMaker
-infix fun ColumnSchema.constraints(constraint: Constraint): ColumnSchema =
-    copy(constraints = constraints + constraint)
+infix fun ColumnSchema.constraints(constraint: Constraint): ColumnSchema {
+    constraints += constraint
+    return this
+}
 
 @SchemaMaker
 infix fun ColumnSchema.and(constraint: Constraint): ColumnSchema = constraints(constraint)
@@ -38,5 +46,6 @@ infix fun ColumnSchema.and(constraint: Constraint): ColumnSchema = constraints(c
 @SchemaMaker
 infix fun ColumnSchema.foreignKey(value: String): ColumnSchema {
     require(value.isNotEmpty())
-    return copy(foreignKey = value)
+    foreignKey = value
+    return this
 }

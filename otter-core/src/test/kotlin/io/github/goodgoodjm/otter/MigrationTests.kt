@@ -18,17 +18,17 @@ class MigrationTests {
         val migration = object : Migration() {
             override fun up() {
                 createTable("person") {
-                    it["id"] = int() constraints PRIMARY and AUTO_INCREMENT
-                    it["name"] = varchar(30)
-                    it["message"] = varchar()
-                    it["address_id"] = int() foreignKey "address(id)"
-                    it["lat"] = long() constraints UNIQUE
-                    it["nullable"] = bool() constraints NULLABLE
+                    "id" - int() constraints PRIMARY and AUTO_INCREMENT
+                    "name" - varchar(30)
+                    "message" - varchar()
+                    "address_id" - int() foreignKey "address(id)"
+                    "lat" - long() constraints UNIQUE
+                    "nullable" - bool() constraints NULLABLE
                 }
 
                 createTable("post") {
-                    it["id"] = int() constraints PRIMARY and AUTO_INCREMENT
-                    it["person_id"] = int() foreignKey "person(id)"
+                    "id" - int() constraints PRIMARY and AUTO_INCREMENT
+                    "person_id" - int() foreignKey "person(id)"
                 }
             }
 

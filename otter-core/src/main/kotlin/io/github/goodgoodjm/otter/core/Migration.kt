@@ -20,10 +20,16 @@ abstract class Migration {
 
 
     @SchemaMaker
-    fun createTable(name: String, block: (TableSchema) -> Unit) {
+    fun createTable(name: String, block: TableSchema.() -> Unit) {
         val tableSchema = TableSchema(name).apply(block)
         val table = CreateTableContext(tableSchema)
         _contexts.add(table)
+    }
+
+    @SchemaMaker
+    @Deprecated("", ReplaceWith("createTable(name, block)"))
+    fun createTable_(name: String, block: (TableSchema) -> Unit) {
+        createTable(name, block)
     }
 
     fun dropTable(name: String) {

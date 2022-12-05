@@ -44,12 +44,12 @@ class CreateTableContextTests {
     fun `V2 test`() {
         val tableName = "person"
 
-        val table = CreateTableContext(TableSchema(tableName).also {
-            it["id"] = int() constraints PRIMARY and AUTO_INCREMENT
-            it["name"] = varchar()
-            it["address_id"] = int() foreignKey "address(id)"
-            it["lat"] = long() constraints UNIQUE
-            it["nullable"] = bool() constraints NULLABLE
+        val table = CreateTableContext(TableSchema(tableName).apply {
+            "id" - int() constraints PRIMARY and AUTO_INCREMENT
+            "name" - varchar()
+            "address_id" - int() foreignKey "address(id)"
+            "lat" - long() constraints UNIQUE
+            "nullable" - bool() constraints NULLABLE
         })
 
         table.tableSchema.also {
