@@ -1,6 +1,11 @@
 package io.github.goodgoodjm.otter.core.dsl.type
 
+import io.github.goodgoodjm.otter.core.dsl.Constraint
 import io.github.goodgoodjm.otter.core.dsl.createtable.ColumnSchema
+import io.github.goodgoodjm.otter.core.dsl.createtable.and
+import io.github.goodgoodjm.otter.core.dsl.createtable.constraints
+import io.github.goodgoodjm.otter.core.dsl.type.Type.INT
+import io.github.goodgoodjm.otter.core.dsl.type.Type.LONG
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.*
 
@@ -97,3 +102,7 @@ object Type {
     val DURATION get() = duration()
 }
 
+object TypeUtils {
+    val ID get() = INT constraints Constraint.PRIMARY and Constraint.AUTO_INCREMENT
+    val LONG_ID get() = LONG constraints Constraint.PRIMARY and Constraint.AUTO_INCREMENT
+}
