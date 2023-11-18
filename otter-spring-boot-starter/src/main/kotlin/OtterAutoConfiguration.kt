@@ -23,6 +23,7 @@ open class OtterAutoConfiguration(
         properties: OtterProperties,
     ) {
         private val config: OtterConfig = OtterConfig(
+            targetVersion = properties.targetVersion,
             migrationPath = properties.migrationPath,
             driverClassName = properties.driverClassName,
             url = properties.url,

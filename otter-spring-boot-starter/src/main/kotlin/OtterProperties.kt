@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConfigurationProperties(prefix = "otter")
 data class OtterProperties(
     val enabled: Boolean = true,
+    val targetVersion: String = "",
     val migrationPath: String = "",
     val driverClassName: String = "",
     val url: String = "",
