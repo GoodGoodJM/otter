@@ -39,7 +39,7 @@ class Otter(
     }
 
     fun up() = migrationScope {
-        MigrationProcess(this, config.migrationPath, config.showSql).exec()
+        MigrationProcess(this, config.targetVersion, config.migrationPath, config.showSql).exec()
     }
 }
 
@@ -59,6 +59,7 @@ object LockTable : IntIdTable("otter_lock") {
 
 class MigrationProcess(
     private val transaction: Transaction,
+    private val targetVersion: String,
     private val migrationPath: String,
     private val showSql: Boolean,
 ) {
@@ -100,10 +101,10 @@ class MigrationProcess(
             }
         }
 
-        if (!MigrationTable.exists()) {
+        if (!MigrationTable.exists())
             SchemaUtils.create(MigrationTable)
-        }
     }
+
 
     private fun waitForLock() {
         var hasLock = false
@@ -188,6 +189,7 @@ class MigrationProcess(
 
     private fun loadMigrations(): Map<String, Migration> = ResourceResolver().resolveEntries(migrationPath)
         .sortedBy { it }
+        .run(::applyVersionConfig)
         .also { logger.debug("Target files : $it") }
         .associateWith { this::class.java.classLoader.getResource(it) }
         .filterValues { it != null }
@@ -198,5 +200,17 @@ class MigrationProcess(
         val engine = ScriptEngineManager().getEngineByExtension("kts")
         return engine.eval(reader) as Migration
     }
-}
 
+    private fun applyVersionConfig(files: List<String>): List<String> {
+        if (targetVersion.isNullOrEmpty())
+            return files
+
+        val targetIndex = files.indexOfFirst { it.split("/").last() == targetVersion }
+        if (targetIndex < 0) {
+            logger.debug("Cannot apply config. target version file: $targetVersion is missing")
+            return files
+        }
+
+        return files.subList(0, targetIndex + 1)
+    }
+}

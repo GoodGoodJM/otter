@@ -18,6 +18,7 @@ class AutoConfigurationApplicationTests {
             "otter.password=",
             "otter.migrationPath=migrations",
             "otter.showSql=true",
+            "otter.targetVersion=C.kts"
         ).run { context ->
             assertThat(context).getBean(OtterAutoConfiguration::class.java)
         }
