@@ -64,6 +64,7 @@ class MigrationProcess(
     private val showSql: Boolean,
 ) {
     private var hasLock: Boolean = false
+    private var versionFilesName: List<String> = mutableListOf()
 
     companion object : Logger
 
@@ -168,9 +169,23 @@ class MigrationProcess(
         val migrations = loadMigrations()
         for ((name, migration) in migrations) {
             if (latestFilename >= name) {
+                if (isAfterMigrationVersionConfig(name)) {
+                    logger.debug("$name is a migration that applied before version config. drop this migration applied.")
+                    migration.down()
+                    migration.contexts.flatMap { it.resolve() }.forEach {
+                        if (showSql) logger.info(it)
+                        transaction.exec(it)
+                    }
+                    MigrationTable.deleteWhere { MigrationTable.filename eq name }
+                    transaction.commit()
+                    continue
+                }
                 logger.debug("$name is already migrated, will be skipped.")
                 continue
             }
+
+            if (isAfterMigrationVersionConfig(name))
+                continue
 
             migration.up()
             migration.contexts.flatMap { it.resolve() }.forEach {
@@ -187,10 +202,16 @@ class MigrationProcess(
         }
     }
 
+    private fun isAfterMigrationVersionConfig(fileName: String): Boolean {
+        if (versionFilesName.isNotEmpty()) {
+            return versionFilesName.last() < fileName
+        }
+        return false
+    }
+
     private fun loadMigrations(): Map<String, Migration> = ResourceResolver().resolveEntries(migrationPath)
         .sortedBy { it }
-        .run(::applyVersionConfig)
-        .also { logger.debug("Target files : $it") }
+        .also(::checkVersionConfig)
         .associateWith { this::class.java.classLoader.getResource(it) }
         .filterValues { it != null }
         .mapKeys { it.key.split("/").last() }
@@ -201,16 +222,22 @@ class MigrationProcess(
         return engine.eval(reader) as Migration
     }
 
-    private fun applyVersionConfig(files: List<String>): List<String> {
-        if (targetVersion.isNullOrEmpty())
-            return files
+    private fun checkVersionConfig(files: List<String>) {
+        if (targetVersion.isNullOrEmpty()) {
+            logger.debug("Target files : $files")
+            return
+        }
 
         val targetIndex = files.indexOfFirst { it.split("/").last() == targetVersion }
         if (targetIndex < 0) {
-            logger.debug("Cannot apply config. target version file: $targetVersion is missing")
-            return files
+            logger.debug("Cannot apply config. target version file: $targetVersion is missing.\nTarget files : $files")
+            return
         }
 
-        return files.subList(0, targetIndex + 1)
+        versionFilesName = files
+            .subList(0, targetIndex + 1)
+            .map { it.split("/").last() }
+
+        logger.debug("Target files : $versionFilesName")
     }
 }
