@@ -7,4 +7,5 @@ class OtterConfig(
     val user: String,
     val password: String,
     val showSql: Boolean,
+    val version: String,
 )

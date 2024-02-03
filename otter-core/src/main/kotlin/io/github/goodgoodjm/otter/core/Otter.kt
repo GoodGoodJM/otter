@@ -39,7 +39,7 @@ class Otter(
     }
 
     fun up() = migrationScope {
-        MigrationProcess(this, config.migrationPath, config.showSql).exec()
+        MigrationProcess(this, config.migrationPath, config.showSql, config.version).exec()
     }
 }
 
@@ -61,6 +61,7 @@ class MigrationProcess(
     private val transaction: Transaction,
     private val migrationPath: String,
     private val showSql: Boolean,
+    private val version: String,
 ) {
     private var hasLock: Boolean = false
 
@@ -164,7 +165,7 @@ class MigrationProcess(
             }
         }
 
-        val migrations = loadMigrations()
+        val migrations = loadMigrations(version)
         for ((name, migration) in migrations) {
             if (latestFilename >= name) {
                 logger.debug("$name is already migrated, will be skipped.")
@@ -186,13 +187,20 @@ class MigrationProcess(
         }
     }
 
-    private fun loadMigrations(): Map<String, Migration> = ResourceResolver().resolveEntries(migrationPath)
+    private fun loadMigrations(version: String): Map<String, Migration> = ResourceResolver().resolveEntries(migrationPath)
         .sortedBy { it }
         .also { logger.debug("Target files : $it") }
+        .filter { isFileToMigrate(it, version) }
         .associateWith { this::class.java.classLoader.getResource(it) }
         .filterValues { it != null }
         .mapKeys { it.key.split("/").last() }
         .mapValues { evalMigration(it.value!!.openStream().reader()) }
+
+    private fun isFileToMigrate(fileName: String, version: String): Boolean {
+        if(version.isNullOrEmpty())
+            return true
+        return fileName.split("/").last() > version
+    }
 
     private fun evalMigration(reader: Reader): Migration {
         val engine = ScriptEngineManager().getEngineByExtension("kts")
