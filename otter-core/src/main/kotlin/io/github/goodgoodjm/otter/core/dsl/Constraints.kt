@@ -8,3 +8,4 @@ enum class Constraint {
     UNIQUE,
     PRIMARY,
 }
+

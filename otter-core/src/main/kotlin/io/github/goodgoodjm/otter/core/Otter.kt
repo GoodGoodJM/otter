@@ -165,41 +165,62 @@ class MigrationProcess(
             }
         }
 
-        val migrations = loadMigrations(version)
+        val migrations = loadMigrations()
         for ((name, migration) in migrations) {
+            if(isFileToRollback(name, latestFilename)){
+                logger.debug("$name is already migrated but is not suitable for the set version, will be rollback.")
+                migration.down()
+
+
+                transaction {
+                    MigrationTable.deleteWhere { MigrationTable.filename eq name }
+                    commit()
+                }
+                continue
+            }
+
             if (latestFilename >= name) {
                 logger.debug("$name is already migrated, will be skipped.")
                 continue
             }
 
-            migration.up()
-            migration.contexts.flatMap { it.resolve() }.forEach {
-                if (showSql) logger.info(it)
-                transaction.exec(it)
-            }
+            if(isFileToMigrate(name)){
+                migration.up()
+                migration.contexts.flatMap { it.resolve() }.forEach {
+                    if (showSql) logger.info(it)
+                    transaction.exec(it)
+                }
 
-            MigrationTable.insert {
-                it[filename] = name
-                it[comment] = migration.comment
-            }
+                MigrationTable.insert {
+                    it[filename] = name
+                    it[comment] = migration.comment
+                }
 
-            transaction.commit()
+                transaction.commit()
+                continue
+            }
+            logger.debug("Cannot recognize file: [$name].")
         }
     }
 
-    private fun loadMigrations(version: String): Map<String, Migration> = ResourceResolver().resolveEntries(migrationPath)
+    private fun loadMigrations(): Map<String, Migration> = ResourceResolver().resolveEntries(migrationPath)
         .sortedBy { it }
         .also { logger.debug("Target files : $it") }
-        .filter { isFileToMigrate(it, version) }
         .associateWith { this::class.java.classLoader.getResource(it) }
         .filterValues { it != null }
         .mapKeys { it.key.split("/").last() }
         .mapValues { evalMigration(it.value!!.openStream().reader()) }
 
-    private fun isFileToMigrate(fileName: String, version: String): Boolean {
+    private fun isFileToMigrate(fileName: String): Boolean {
         if(version.isNullOrEmpty())
             return true
-        return fileName.split("/").last() > version
+        return fileName <= version
+    }
+
+    private fun isFileToRollback(fileName: String, latestFileName: String): Boolean {
+        if(version.isNullOrEmpty())
+            return false
+        return fileName <= latestFileName && fileName > version
     }
 
     private fun evalMigration(reader: Reader): Migration {
