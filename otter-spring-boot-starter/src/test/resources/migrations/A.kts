@@ -17,6 +17,6 @@ object : Migration() {
     }
 
     override fun down() {
-        dropTable("person")
+        dropTable("Test")
     }
 }

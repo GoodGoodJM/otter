@@ -155,51 +155,56 @@ class MigrationProcess(
 
     private fun migration() {
         val latestAppliedMigration = MigrationTable.last()
-        val latestFilename = if (latestAppliedMigration == null) {
-            "".also {
-                logger.debug("There is no applied migrations. All migrations would be applied.")
-            }
-        } else {
-            latestAppliedMigration[MigrationTable.filename].also {
-                logger.debug("There are applied migrations(last=$it).")
-            }
+        val latestFilename = latestAppliedMigration?.get(MigrationTable.filename) ?: "".also {
+            logger.debug("There is no applied migrations. All migrations would be applied.")
         }
 
         val migrations = loadMigrations()
-        for ((name, migration) in migrations) {
-            if(isFileToRollback(name, latestFilename)){
-                logger.debug("$name is already migrated but is not suitable for the set version, will be rollback.")
-                migration.down()
-
-
-                transaction {
-                    MigrationTable.deleteWhere { MigrationTable.filename eq name }
-                    commit()
-                }
-                continue
+        migrations.forEach { (name, migration) ->
+            when {
+                shouldRollback(name, latestFilename) -> handleRollback(name, migration)
+                shouldMigrate(name, latestFilename) -> handleMigration(name, migration)
+                else -> logger.debug("$name is already migrated or isn't included in the target version, will be skipped.")
             }
+        }
+    }
 
-            if (latestFilename >= name) {
-                logger.debug("$name is already migrated, will be skipped.")
-                continue
-            }
+    private fun shouldRollback(name: String, latestFilename: String): Boolean {
+        if(version.isNullOrEmpty())
+            return name <= latestFilename
+        return name > version && name <= latestFilename
+    }
 
-            if(isFileToMigrate(name)){
-                migration.up()
-                migration.contexts.flatMap { it.resolve() }.forEach {
-                    if (showSql) logger.info(it)
-                    transaction.exec(it)
-                }
+    private fun shouldMigrate(name: String, latestFilename: String): Boolean {
+        if(version.isNullOrEmpty())
+            return name > latestFilename
+        return name <= version && name > latestFilename
+    }
 
-                MigrationTable.insert {
-                    it[filename] = name
-                    it[comment] = migration.comment
-                }
+    private fun handleRollback(name: String, migration: Migration) {
+        logger.debug("$name is already migrated but is not suitable for the set version, will be rollback.")
 
-                transaction.commit()
-                continue
-            }
-            logger.debug("Cannot recognize file: [$name].")
+        migration.down()
+        migration.contexts.flatMap { it.resolve() }.forEach {
+            if (showSql) logger.info(it)
+            transaction.exec(it)
+        }
+        transaction.commit()
+
+        MigrationTable.deleteWhere { MigrationTable.filename eq name }
+    }
+
+    private fun handleMigration(name: String, migration: Migration) {
+        migration.up()
+        migration.contexts.flatMap { it.resolve() }.forEach {
+            if (showSql) logger.info(it)
+            transaction.exec(it)
+        }
+        transaction.commit()
+
+        MigrationTable.insert {
+            it[filename] = name
+            it[comment] = migration.comment
         }
     }
 
@@ -210,18 +215,6 @@ class MigrationProcess(
         .filterValues { it != null }
         .mapKeys { it.key.split("/").last() }
         .mapValues { evalMigration(it.value!!.openStream().reader()) }
-
-    private fun isFileToMigrate(fileName: String): Boolean {
-        if(version.isNullOrEmpty())
-            return true
-        return fileName <= version
-    }
-
-    private fun isFileToRollback(fileName: String, latestFileName: String): Boolean {
-        if(version.isNullOrEmpty())
-            return false
-        return fileName <= latestFileName && fileName > version
-    }
 
     private fun evalMigration(reader: Reader): Migration {
         val engine = ScriptEngineManager().getEngineByExtension("kts")
