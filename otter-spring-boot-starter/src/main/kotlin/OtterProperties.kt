@@ -13,4 +13,5 @@ data class OtterProperties(
     val username: String = "",
     val password: String = "",
     val showSql: Boolean = false,
+    val version: String = ""
 )

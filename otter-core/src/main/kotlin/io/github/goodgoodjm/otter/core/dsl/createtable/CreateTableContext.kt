@@ -43,8 +43,6 @@ class DynamicPrimaryKeyTable(name: String) : Table(name) {
             }
         }
 
-
-
         columnSchema.foreignKey?.let { expression ->
             val result = REGEX.find(expression) ?: throw Exception("Wrong foreignKey expression.")
             val (tableName, columnName) = result.destructured

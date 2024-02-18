@@ -6,10 +6,10 @@ import io.github.goodgoodjm.otter.core.dsl.type.Type.INT
 import io.github.goodgoodjm.otter.core.dsl.type.Type.VARCHAR
 
 object : Migration() {
-    override val comment = "Create person"
+    override val comment = "Create Test"
 
     override fun up() {
-        createTable("person") {
+        createTable("Test") {
             "id" - INT constraints PRIMARY and AUTO_INCREMENT
             "name" - VARCHAR constraints UNIQUE
             "age" - INT
@@ -17,6 +17,6 @@ object : Migration() {
     }
 
     override fun down() {
-        dropTable("person")
+        dropTable("Test")
     }
 }
