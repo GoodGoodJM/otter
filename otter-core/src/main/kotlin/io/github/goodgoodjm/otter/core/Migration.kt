@@ -3,6 +3,7 @@ package io.github.goodgoodjm.otter.core
 import io.github.goodgoodjm.otter.core.dsl.AlterColumnSchema
 import io.github.goodgoodjm.otter.core.dsl.SchemaContext
 import io.github.goodgoodjm.otter.core.dsl.SchemaMaker
+import io.github.goodgoodjm.otter.core.dsl.altertable.AlterTableSchema
 import io.github.goodgoodjm.otter.core.dsl.createtable.CreateTableContext
 import io.github.goodgoodjm.otter.core.dsl.createtable.TableSchema
 import org.jetbrains.exposed.sql.Table
@@ -27,6 +28,12 @@ abstract class Migration {
     }
 
     @SchemaMaker
+    fun alter(name: String, block: AlterTableSchema.() -> Unit) {
+        var tableSchema = AlterTableSchema(name).apply(block)
+        //TODO: Not implement yet
+    }
+
+    @SchemaMaker
     @Deprecated("", ReplaceWith("createTable(name, block)"))
     fun createTable_(name: String, block: (TableSchema) -> Unit) {
         createTable(name, block)
@@ -42,16 +49,5 @@ abstract class Migration {
         _contexts.add(object : SchemaContext {
             override fun resolve(): List<String> = listOf(sql)
         })
-    }
-
-    fun addColumn(block: AlterColumnSchema.() -> Unit) = alterColumn(AlterColumnSchema.Type.ADD, block)
-
-    fun dropColumn(block: AlterColumnSchema.() -> Unit) = alterColumn(AlterColumnSchema.Type.DROP, block)
-
-    private fun alterColumn(type: AlterColumnSchema.Type, block: AlterColumnSchema.() -> Unit) {
-        val alterColumnSchema = AlterColumnSchema()
-        alterColumnSchema.alterType = type
-        alterColumnSchema.block()
-        // _contexts.add(alterColumnSchema)
     }
 }

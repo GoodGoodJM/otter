@@ -1,5 +1,6 @@
 package io.github.goodgoodjm.otter.core.dsl.createtable
 
+import io.github.goodgoodjm.otter.core.dsl.AlterColumnSchema
 import io.github.goodgoodjm.otter.core.dsl.Constraint
 import io.github.goodgoodjm.otter.core.dsl.SchemaMaker
 import io.github.goodgoodjm.otter.core.dsl.type.CustomColumnType
@@ -29,10 +30,10 @@ data class ColumnSchema internal constructor(
     val columnType: ColumnType,
     var constraints: List<Constraint> = listOf(),
     var foreignKey: String? = null,
+    var defaultValue: Comparable<*>? = null,
 ) {
     constructor (type: String, constraints: List<Constraint> = listOf()) : this(CustomColumnType(type), constraints)
 }
-
 
 @SchemaMaker
 infix fun ColumnSchema.constraints(constraint: Constraint): ColumnSchema {
@@ -47,5 +48,11 @@ infix fun ColumnSchema.and(constraint: Constraint): ColumnSchema = constraints(c
 infix fun ColumnSchema.foreignKey(value: String): ColumnSchema {
     require(value.isNotEmpty())
     foreignKey = value
+    return this
+}
+
+@SchemaMaker
+infix fun ColumnSchema.default(typeDefault: Comparable<*>): ColumnSchema {
+    defaultValue = typeDefault
     return this
 }

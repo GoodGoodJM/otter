@@ -4,6 +4,7 @@ import io.github.goodgoodjm.otter.core.Logger
 import io.github.goodgoodjm.otter.core.dsl.Constraint
 import io.github.goodgoodjm.otter.core.dsl.SchemaContext
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
 
 class CreateTableContext constructor(val tableSchema: TableSchema) : SchemaContext {
@@ -32,6 +33,7 @@ class DynamicPrimaryKeyTable(name: String) : Table(name) {
 
 
     private fun addColumn(name: String, columnSchema: ColumnSchema) {
+        var a =SchemaUtils
         var column = registerColumn<Comparable<Any>>(name, columnSchema.columnType)
         columnSchema.constraints.forEach { constraint ->
             when (constraint) {

@@ -20,7 +20,7 @@ class AutoConfigurationApplicationTests {
     fun TEMP() {
         contextRunner.withPropertyValues(
             "otter.driverClassName=org.h2.Driver",
-            "otter.url=jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+            "otter.url=jdbc:h2:mem:test;",
             "otter.username=root",
             "otter.password=",
             "otter.migrationPath=migrations",
@@ -36,7 +36,7 @@ class AutoConfigurationApplicationTests {
             "otter.password=",
             "otter.migrationPath=migrations",
             "otter.showSql=true",
-            "otter.version=B.kts"
+            "otter.version=A.kts"
         ).run { context ->
             assertThat(context).getBean(OtterAutoConfiguration::class.java)
         }

@@ -1,5 +1,6 @@
 package io.github.goodgoodjm.otter.core.dsl.altertable
 
+import io.github.goodgoodjm.otter.core.dsl.AlterColumnSchema
 import io.github.goodgoodjm.otter.core.dsl.Constraint
 import io.github.goodgoodjm.otter.core.dsl.SchemaContext
 import io.github.goodgoodjm.otter.core.dsl.SchemaMaker
@@ -9,7 +10,7 @@ class AlterTableContext(tableSchema: TableSchema) : SchemaContext {
     lateinit var columnContext: ColumnContext
 
     @SchemaMaker
-    fun addColumn(name: String, block: AddColumnSchema.() -> Unit): AlterTableContext {
+    fun addColumn(name: String, block: AlterColumnSchema.() -> Unit): AlterTableContext {
         return this
     }
 
@@ -28,7 +29,7 @@ class AlterTableContext(tableSchema: TableSchema) : SchemaContext {
         return this
     }
 
-    class ColumnContext(columnSchema: AddColumnSchema) {
+    class ColumnContext(columnSchema: AlterColumnSchema) {
         val name = columnSchema.name
     }
 
